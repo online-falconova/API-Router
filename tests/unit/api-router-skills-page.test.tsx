@@ -4,7 +4,7 @@
  * split, file structure, source patterns, and exported symbols without DOM rendering.
  *
  * Run:
- *   node --import tsx/esm --test tests/unit/omni-skills-page.test.tsx
+ *   node --import tsx/esm --test tests/unit/api-router-skills-page.test.tsx
  */
 
 import { describe, it } from "node:test";
@@ -13,7 +13,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 
 const cwd = process.cwd();
-const base = resolve(join(cwd, "src/app/(dashboard)/dashboard/omni-skills"));
+const base = resolve(join(cwd, "src/app/(dashboard)/dashboard/api-router-skills"));
 
 // ─── File structure ──────────────────────────────────────────────────────────
 
@@ -23,7 +23,7 @@ describe("File structure — omni-skills directory", () => {
     assert.ok(!existsSync(oldPath), `Old skills/ directory must be absent (found at ${oldPath})`);
   });
 
-  it("new /dashboard/omni-skills directory exists", () => {
+  it("new /dashboard/api-router-skills directory exists", () => {
     assert.ok(existsSync(base), `omni-skills/ directory must exist at ${base}`);
   });
 
@@ -312,10 +312,10 @@ describe("E2E spec path", () => {
     "utf-8"
   );
 
-  it("uses /dashboard/omni-skills (not /dashboard/skills)", () => {
+  it("uses /dashboard/api-router-skills (not /dashboard/skills)", () => {
     assert.ok(
-      src.includes("/dashboard/omni-skills"),
-      "E2E spec must navigate to /dashboard/omni-skills"
+      src.includes("/dashboard/api-router-skills"),
+      "E2E spec must navigate to /dashboard/api-router-skills"
     );
     assert.ok(
       !src.includes('"/dashboard/skills"') && !src.includes("'/dashboard/skills'"),

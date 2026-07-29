@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────
-#  OmniRoute — Dokploy deployment
+#  API Router — Dokploy deployment
 # ──────────────────────────────────────────────────────────────────────
 #
 #  Designed for Dokploy (Docker Compose service type). Differences from
@@ -33,7 +33,7 @@
 #
 #       STORAGE_ENCRYPTION_KEY=<openssl rand -hex 32>
 #
-#  3. Domains tab — add your domain, service `omniroute`, container port
+#  3. Domains tab — add your domain, service `api-router`, container port
 #     `20128`, HTTPS on with Let's Encrypt.
 #  4. Deploy. First boot runs SQLite migrations, so give it ~1 min.
 #
@@ -43,11 +43,11 @@
 #  docs/architecture/cluster-decisions.md. Redis below is the rate limiter, not
 #  storage. So the only storage decision that matters is the volume:
 #
-#    • Keep omniroute-data on local disk. SQLite locking is unreliable over
+#    • Keep api-router-data on local disk. SQLite locking is unreliable over
 #      NFS/CIFS/SMB and WAL mode can corrupt on a network mount.
 #    • Run exactly ONE replica. Several processes writing one SQLite file over a
 #      shared volume loses data. Do not scale this service in Dokploy.
-#    • Add a Dokploy Volume Backup on omniroute-data with an S3 destination.
+#    • Add a Dokploy Volume Backup on api-router-data with an S3 destination.
 #      The app also snapshots SQLite before every migration
 #      (DISABLE_SQLITE_AUTO_BACKUP=false, on by default — leave it on).
 #
@@ -66,7 +66,7 @@
 # ──────────────────────────────────────────────────────────────────────
 
 services:
-  omniroute:
+  api-router:
     build:
       context: .
       dockerfile: Dockerfile
@@ -74,7 +74,7 @@ services:
       args:
         OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
         OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
-    image: omniroute:dokploy
+    image: api-router:dokploy
     restart: unless-stopped
     stop_grace_period: 40s
     depends_on:
@@ -110,7 +110,7 @@ services:
       # though the app is publicly proxied.
       BASE_URL: http://localhost:20128
       # Public origin, used for OAuth callbacks, dashboard links and cookies.
-      NEXT_PUBLIC_BASE_URL: ${PUBLIC_URL:?set PUBLIC_URL to your public https URL, e.g. https://omniroute.example.com}
+      NEXT_PUBLIC_BASE_URL: ${PUBLIC_URL:?set PUBLIC_URL to your public https URL, e.g. https://api.example.com}
 
       # ── Live monitoring WebSocket ──
       LIVE_WS_PORT: 20132
@@ -128,7 +128,7 @@ services:
       # Never echo full key values back into the dashboard UI.
       ALLOW_API_KEY_REVEAL: "false"
       # Per-deployment salt so machine IDs are not shared across instances.
-      MACHINE_ID_SALT: ${MACHINE_ID_SALT:-omniroute-dokploy}
+      MACHINE_ID_SALT: ${MACHINE_ID_SALT:-api-router-dokploy}
       # No CORS origins by default: the dashboard is same-origin and uses CSRF
       # protection. Add explicit origins only if a browser client needs them.
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
@@ -154,7 +154,7 @@ services:
       NEXT_PUBLIC_LIVE_WS_PUBLIC_URL: ${NEXT_PUBLIC_LIVE_WS_PUBLIC_URL:-}
 
     volumes:
-      - omniroute-data:/app/data
+      - api-router-data:/app/data
 
     # The image already defines a HEALTHCHECK (node healthcheck.mjs); this only
     # stretches start_period, since first boot runs SQLite migrations.
@@ -206,7 +206,7 @@ services:
 
 volumes:
   # No explicit `name:` — Dokploy prefixes these per project so stacks stay isolated.
-  omniroute-data:
+  api-router-data:
   redis-data:
 
 networks:

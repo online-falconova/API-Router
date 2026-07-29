@@ -137,7 +137,7 @@ test.describe("Skills marketplace", () => {
       });
     });
 
-    await gotoDashboardRoute(page, "/dashboard/omni-skills", {
+    await gotoDashboardRoute(page, "/dashboard/api-router-skills", {
       timeoutMs: NAVIGATION_TIMEOUT_MS,
     });
 

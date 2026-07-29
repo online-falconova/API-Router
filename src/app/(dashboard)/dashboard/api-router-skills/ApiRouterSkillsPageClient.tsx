@@ -20,7 +20,7 @@ interface Execution {
   createdAt: string;
 }
 
-export function OmniSkillsPageClient(): JSX.Element {
+export function ApiRouterSkillsPageClient(): JSX.Element {
   const [skills, setSkills] = useState<OmniSkill[]>([]);
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [loading, setLoading] = useState(true);
@@ -379,4 +379,4 @@ export function OmniSkillsPageClient(): JSX.Element {
   );
 }
 
-export default OmniSkillsPageClient;
+export default ApiRouterSkillsPageClient;

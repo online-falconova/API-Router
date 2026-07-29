@@ -84,25 +84,25 @@
   "src/app/(dashboard)/dashboard/memory/components/tabs/MemoriesTab.tsx": {
     "TS2322": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/OmniSkillsPageClient.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/ApiRouterSkillsPageClient.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/OmniExecutionsTab.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/OmniExecutionsTab.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/OmniMarketplaceTab.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/OmniMarketplaceTab.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/OmniSandboxTab.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/OmniSandboxTab.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/OmniSkillCard.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/OmniSkillCard.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/OmniSkillsList.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/OmniSkillsList.tsx": {
     "TS2503": 1
   },
-  "src/app/(dashboard)/dashboard/omni-skills/components/SkillInspectorPane.tsx": {
+  "src/app/(dashboard)/dashboard/api-router-skills/components/SkillInspectorPane.tsx": {
     "TS2503": 1
   },
   "src/app/(dashboard)/dashboard/playground/components/PresetPicker.tsx": {

@@ -405,7 +405,13 @@ const nextConfig = {
       // Dashboard routes
       {
         source: "/dashboard/skills",
-        destination: "/dashboard/omni-skills",
+        destination: "/dashboard/api-router-skills",
+        permanent: true,
+      },
+      {
+        // Legacy path from before the API Router rebrand — keep bookmarks alive.
+        source: "/dashboard/omni-skills",
+        destination: "/dashboard/api-router-skills",
         permanent: true,
       },
       // Architecture

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card } from "@/shared/components";
 import { SKILLS_PROVIDER_LABELS, type SkillsProvider } from "@/shared/constants/skillsProviders";
-import { ApiRouterSkillsTab } from "./ApiRouterSkillsTab";
+import { ApiRouterSkillsTab } from "../../api-router-skills/components/ApiRouterSkillsTab";
 
 interface MarketplaceSkill {
   name: string;

@@ -553,7 +553,7 @@ const AGENTIC_FEATURES_ITEMS: readonly SidebarSectionChild[] = [
   },
   {
     id: "skills",
-    href: "/dashboard/omni-skills",
+    href: "/dashboard/api-router-skills",
     i18nKey: "omniSkills",
     subtitleKey: "omniSkillsSubtitle",
     icon: "auto_fix_high",
