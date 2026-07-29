@@ -197,7 +197,7 @@ consumes. Section 8 covers how to add ones that aren't in the list.
 
 Replace every `<...>` placeholder with your real values from step 1.2.
 
-```env
+```bash
 # ── Required: public origin ───────────────────────────────────────────
 # Must be the exact https origin you will add in the Domains tab.
 # No trailing slash. Used for OAuth callbacks, dashboard links, cookies.
