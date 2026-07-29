@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/shared/components";
 import { useTranslations } from "next-intl";
-import { isSkillsProvider, type SkillsProvider } from "@/lib/skills/providerSettings";
+import { isSkillsProvider, type SkillsProvider } from "@/shared/constants/skillsProviders";
 
 interface MemoryConfig {
   enabled: boolean;

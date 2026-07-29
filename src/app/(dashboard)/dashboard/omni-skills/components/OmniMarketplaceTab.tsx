@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card } from "@/shared/components";
-import { SKILLS_PROVIDER_LABELS, type SkillsProvider } from "@/lib/skills/providerSettings";
+import { SKILLS_PROVIDER_LABELS, type SkillsProvider } from "@/shared/constants/skillsProviders";
 import { ApiRouterSkillsTab } from "./ApiRouterSkillsTab";
 
 interface MarketplaceSkill {

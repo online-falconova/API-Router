@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Card } from "@/shared/components";
 import { SkillsConceptCard } from "@/shared/components";
-import type { SkillsProvider } from "@/lib/skills/providerSettings";
+import type { SkillsProvider } from "@/shared/constants/skillsProviders";
 import { OmniSkillsList } from "./components/OmniSkillsList";
 import { OmniExecutionsTab } from "./components/OmniExecutionsTab";
 import { OmniSandboxTab } from "./components/OmniSandboxTab";
@@ -211,9 +211,7 @@ export function OmniSkillsPageClient(): JSX.Element {
           <p className="text-2xl font-bold text-emerald-400 mt-1">{enabledCount}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs text-text-muted uppercase tracking-wide">
-            {t("totalExecutions")}
-          </p>
+          <p className="text-xs text-text-muted uppercase tracking-wide">{t("totalExecutions")}</p>
           <p className="text-2xl font-bold text-violet-400 mt-1">{execTotal}</p>
         </Card>
         <Card className="p-4">
