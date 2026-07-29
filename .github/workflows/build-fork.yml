@@ -14,13 +14,13 @@ permissions:
 
 env:
   # GHCR requires a lowercase image path, so this is not a 1:1 echo of the repo name
-  # (cloud-falconova/API-Router).
-  IMAGE_NAME: ghcr.io/cloud-falconova/api-router
+  # (online-falconova/API-Router).
+  IMAGE_NAME: ghcr.io/online-falconova/api-router
 
 jobs:
   build:
     name: Build and Push Fork Image
-    if: github.repository == 'cloud-falconova/API-Router'
+    if: github.repository == 'online-falconova/API-Router'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,8 +53,8 @@ jobs:
           labels: |
             org.opencontainers.image.title=api-router
             org.opencontainers.image.description=Unified AI proxy/router — API Router fork image
-            org.opencontainers.image.url=https://github.com/cloud-falconova/API-Router
-            org.opencontainers.image.source=https://github.com/cloud-falconova/API-Router
+            org.opencontainers.image.url=https://github.com/online-falconova/API-Router
+            org.opencontainers.image.source=https://github.com/online-falconova/API-Router
             org.opencontainers.image.licenses=MIT
 
       - name: Build and push

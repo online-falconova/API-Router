@@ -80,7 +80,7 @@ services:
     # VPS does not, so the compile happens in Actions and the VPS only ever pulls.
     #
     # Pin a specific build by overriding this in the Dokploy environment, e.g.
-    #   API_ROUTER_IMAGE=ghcr.io/cloud-falconova/api-router:sha-<commit>
+    #   API_ROUTER_IMAGE=ghcr.io/online-falconova/api-router:sha-<commit>
     # `latest` tracks the tip of main.
     #
     # NOTE: GHCR packages are PRIVATE by default. Either mark the package public
@@ -96,7 +96,7 @@ services:
     #     args:
     #       OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
     #       OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
-    image: ${API_ROUTER_IMAGE:-ghcr.io/cloud-falconova/api-router:latest}
+    image: ${API_ROUTER_IMAGE:-ghcr.io/online-falconova/api-router:latest}
     restart: unless-stopped
     stop_grace_period: 40s
     depends_on:

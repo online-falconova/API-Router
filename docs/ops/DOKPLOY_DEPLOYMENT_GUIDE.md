@@ -222,7 +222,7 @@ CORS_ALLOWED_ORIGINS=
 # ── Optional: pin a specific image build ──────────────────────────────
 # Defaults to :latest, which tracks the tip of main. Pin a commit to make
 # deploys reproducible and rollbacks trivial.
-# API_ROUTER_IMAGE=ghcr.io/cloud-falconova/api-router:sha-<commit>
+# API_ROUTER_IMAGE=ghcr.io/online-falconova/api-router:sha-<commit>
 
 # ── Optional: raise the runtime heap ──────────────────────────────────
 # The image caps the server heap at 1024 MB. Raise it only if you run large
