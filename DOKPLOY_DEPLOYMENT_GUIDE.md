@@ -7,7 +7,7 @@ lastUpdated: 2026-07-30
 # Dokploy Deployment Guide
 
 Step-by-step deployment of this project on a [Dokploy](https://dokploy.com/) VPS using
-the purpose-built [`docker-compose.dokploy.yml`](../../docker-compose.dokploy.yml).
+the purpose-built [`docker-compose.dokploy.yml`](docker-compose.dokploy.yml).
 
 ---
 
@@ -18,7 +18,7 @@ There is nothing to set up, and adding a Postgres service will do nothing.
 
 | Claim                          | Reality                                                                                                                                           |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "It needs Postgres"            | **No.** PostgreSQL is an explicit **DROP** in [`docs/architecture/cluster-decisions.md`](../architecture/cluster-decisions.md).                   |
+| "It needs Postgres"            | **No.** PostgreSQL is an explicit **DROP** in [`docs/architecture/cluster-decisions.md`](docs/architecture/cluster-decisions.md).                 |
 | "It needs an external DB"      | **No.** Persistence is SQLite only — 131 migrations in `src/lib/db/migrations/` and 111 modules in `src/lib/db/`, all targeting `better-sqlite3`. |
 | "`DATABASE_URL` configures it" | **No.** That variable is not read anywhere in `src/`, `open-sse/`, or `bin/`.                                                                     |
 | "Redis is the database"        | **No.** Redis is the rate-limiter backend only (`src/shared/utils/rateLimiter.ts`). No application state lives there.                             |
@@ -158,7 +158,7 @@ Stay on **General**.
 3. **Repository** → select your fork.
 4. **Branch** → the active release line, e.g. `release/v3.8.49`. Not `main` — `main` only
    receives release squash-merges and lags weeks behind (see
-   [`docs/ops/BRANCHING_MODEL.md`](BRANCHING_MODEL.md)).
+   [`docs/ops/BRANCHING_MODEL.md`](docs/ops/BRANCHING_MODEL.md)).
 5. **Compose Path** → type exactly:
 
    ```
@@ -402,7 +402,7 @@ Add `env_file: - .env` to the `api-router` service. Every variable in the editor
 the container. Simpler, but it also forwards typos and unrelated values into the process
 environment, so Option A is preferred.
 
-The full catalog of variables the runtime reads is [`.env.example`](../../.env.example) —
+The full catalog of variables the runtime reads is [`.env.example`](.env.example) —
 it documents every one, with the source file that consumes it.
 
 ---
@@ -549,15 +549,15 @@ so your domain configuration needs no change.
 
 ## Related docs
 
-| Topic                      | Doc                                                                              |
-| -------------------------- | -------------------------------------------------------------------------------- |
-| Every environment variable | [`.env.example`](../../.env.example)                                             |
-| SQLite runtime behavior    | [`docs/ops/SQLITE_RUNTIME.md`](SQLITE_RUNTIME.md)                                |
-| Database operations        | [`docs/ops/DATABASE_GUIDE.md`](DATABASE_GUIDE.md)                                |
-| Generic VPS deployment     | [`docs/ops/VM_DEPLOYMENT_GUIDE.md`](VM_DEPLOYMENT_GUIDE.md)                      |
-| Why no PostgreSQL          | [`docs/architecture/cluster-decisions.md`](../architecture/cluster-decisions.md) |
-| Branch to deploy from      | [`docs/ops/BRANCHING_MODEL.md`](BRANCHING_MODEL.md)                              |
-| Authorization model        | [`docs/architecture/AUTHZ_GUIDE.md`](../architecture/AUTHZ_GUIDE.md)             |
+| Topic                      | Doc                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| Every environment variable | [`.env.example`](.env.example)                                                     |
+| SQLite runtime behavior    | [`docs/ops/SQLITE_RUNTIME.md`](docs/ops/SQLITE_RUNTIME.md)                         |
+| Database operations        | [`docs/ops/DATABASE_GUIDE.md`](docs/ops/DATABASE_GUIDE.md)                         |
+| Generic VPS deployment     | [`docs/ops/VM_DEPLOYMENT_GUIDE.md`](docs/ops/VM_DEPLOYMENT_GUIDE.md)               |
+| Why no PostgreSQL          | [`docs/architecture/cluster-decisions.md`](docs/architecture/cluster-decisions.md) |
+| Branch to deploy from      | [`docs/ops/BRANCHING_MODEL.md`](docs/ops/BRANCHING_MODEL.md)                       |
+| Authorization model        | [`docs/architecture/AUTHZ_GUIDE.md`](docs/architecture/AUTHZ_GUIDE.md)             |
 
 External: [Dokploy Compose docs](https://docs.dokploy.com/docs/core/docker-compose) ·
 [Dokploy Domains](https://docs.dokploy.com/docs/core/domains) ·
