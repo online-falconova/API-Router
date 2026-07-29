@@ -23,7 +23,7 @@ const REPO_PATTERN = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
 const REF_PATTERN = /^[A-Za-z0-9._-]+$/;
 
 const DEFAULT_REPO = "diegosouzapw/awesome-omni-skills";
-/** Pinned to the v0.12.9 release tag (4,715 skills). */
+/** Pinned to the v0.12.9 release tag — 2,486 skills, index schema 1.2.0. */
 const DEFAULT_REF = "v0.12.9";
 const DEFAULT_INDEX_PATH = "skills_index.json";
 
@@ -97,7 +97,7 @@ const IndexEntrySchema = z
     validation_status: z.string().optional(),
     // Upstream v0.12.9 ships objects here, not strings:
     //   { tool, scope, default_path, installer_flag, current_installer_behavior, invocation }
-    // Verified against the real index: 23,739 object entries, 0 string entries.
+    // Verified against the real index: object entries only, zero string entries.
     // The union keeps older/simpler string forms working too.
     install_targets: z
       .array(z.union([z.string(), z.object({ tool: z.string().optional() }).passthrough()]))
@@ -112,7 +112,7 @@ const IndexSchema = z
     generated_at: z.string().optional(),
     total_skills: z.number().optional(),
     // Entries are validated one at a time (see syncSkillCatalog) so a single
-    // malformed record is skipped instead of failing a 4,700-entry sync.
+    // malformed record is skipped instead of failing the whole multi-thousand-entry sync.
     skills: z.array(z.unknown()),
   })
   .passthrough();
