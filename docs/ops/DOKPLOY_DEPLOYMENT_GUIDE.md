@@ -1,3 +1,9 @@
+---
+title: "Dokploy Deployment Guide"
+version: 3.8.50
+lastUpdated: 2026-07-30
+---
+
 # Dokploy Deployment Guide
 
 Step-by-step deployment of this project on a [Dokploy](https://dokploy.com/) VPS using
