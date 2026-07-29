@@ -22,7 +22,7 @@
 #     "Compose File" to `docker-compose.dokploy.yml`.
 #  2. Environment tab — set the required variables:
 #
-#       PUBLIC_URL=https://omniroute.example.com
+#       PUBLIC_URL=https://api.example.com
 #       JWT_SECRET=<openssl rand -base64 48>
 #       API_KEY_SECRET=<openssl rand -hex 32>
 #       INITIAL_PASSWORD=<strong password, change after first login>
@@ -36,6 +36,20 @@
 #  3. Domains tab — add your domain, service `omniroute`, container port
 #     `20128`, HTTPS on with Let's Encrypt.
 #  4. Deploy. First boot runs SQLite migrations, so give it ~1 min.
+#
+#  ── Storage ─────────────────────────────────────────────────────────
+#  There is no external database. This app is SQLite-only: 131 migrations and
+#  146 modules under src/lib/db target it, and PostgreSQL is an explicit DROP in
+#  docs/architecture/cluster-decisions.md. Redis below is the rate limiter, not
+#  storage. So the only storage decision that matters is the volume:
+#
+#    • Keep omniroute-data on local disk. SQLite locking is unreliable over
+#      NFS/CIFS/SMB and WAL mode can corrupt on a network mount.
+#    • Run exactly ONE replica. Several processes writing one SQLite file over a
+#      shared volume loses data. Do not scale this service in Dokploy.
+#    • Add a Dokploy Volume Backup on omniroute-data with an S3 destination.
+#      The app also snapshots SQLite before every migration
+#      (DISABLE_SQLITE_AUTO_BACKUP=false, on by default — leave it on).
 #
 #  ── Notes ───────────────────────────────────────────────────────────
 #  • Build RAM: the Next.js build asks for ~4 GB. On a small VPS lower
@@ -122,6 +136,22 @@ services:
 
       # ── Rate limiting (Redis-backed, password-protected, network-internal) ──
       REDIS_URL: redis://default:${REDIS_PASSWORD:?set REDIS_PASSWORD in the Dokploy environment (openssl rand -hex 24)}@redis:6379
+
+      # ── API Router Skills catalog ──
+      # Pinned to a commit SHA, not a branch: SKILL.md files are instructions handed
+      # to a model that may hold tool access, so an upstream push must never change
+      # what users can install. This SHA serves 4,715 skills; the v0.12.9 *tag* only
+      # has 2,486, so leaving this unset gives you the smaller catalog.
+      OMNIROUTE_SKILLS_CATALOG_REPO: ${OMNIROUTE_SKILLS_CATALOG_REPO:-diegosouzapw/awesome-omni-skills}
+      OMNIROUTE_SKILLS_CATALOG_REF: ${OMNIROUTE_SKILLS_CATALOG_REF:-c3af0048b70a4b84b2f2324e2f7b7ae5206d89b2}
+
+      # ── Live dashboard WebSocket (optional) ──
+      # NEXT_PUBLIC_* is normally inlined at build time, but the server echoes this
+      # value through the /api/v1/ws?handshake=1 handshake, so setting it at runtime
+      # works for a prebuilt image (see src/hooks/useLiveDashboard.ts).
+      # Leave empty unless you route a path or subdomain to port 20132 in Dokploy.
+      # Example: wss://api.example.com/live-ws
+      NEXT_PUBLIC_LIVE_WS_PUBLIC_URL: ${NEXT_PUBLIC_LIVE_WS_PUBLIC_URL:-}
 
     volumes:
       - omniroute-data:/app/data
