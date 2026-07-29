@@ -27,7 +27,7 @@ export interface Skill {
   handler: string;
   enabled: boolean;
   mode?: "on" | "off" | "auto";
-  sourceProvider?: "skillsmp" | "skillssh" | "local";
+  sourceProvider?: "skillsmp" | "skillssh" | "apirouter" | "local";
   tags?: string[];
   installCount?: number;
   createdAt: Date;

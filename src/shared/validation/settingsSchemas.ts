@@ -311,7 +311,7 @@ export const updateSettingsSchema = z.object({
   // SkillsMP marketplace API key
   skillsmpApiKey: z.string().max(200).optional(),
   // Active skills provider (single source of truth for skills page)
-  skillsProvider: z.enum(["skillsmp", "skillssh"]).optional(),
+  skillsProvider: z.enum(["skillsmp", "skillssh", "apirouter"]).optional(),
   // models.dev sync settings
   modelsDevSyncEnabled: z.boolean().optional(),
   modelsDevSyncInterval: z.number().int().min(3600000).max(604800000).optional(),

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/shared/components";
 import { useTranslations } from "next-intl";
-import type { SkillsProvider } from "@/lib/skills/providerSettings";
+import { isSkillsProvider, type SkillsProvider } from "@/lib/skills/providerSettings";
 
 interface MemoryConfig {
   enabled: boolean;
@@ -103,10 +103,7 @@ export default function MemorySkillsTab() {
         if (embeddingData?.models && Array.isArray(embeddingData.models)) {
           setEmbeddingOptions(embeddingData.models);
         }
-        if (
-          settingsData?.skillsProvider === "skillsmp" ||
-          settingsData?.skillsProvider === "skillssh"
-        ) {
+        if (isSkillsProvider(settingsData?.skillsProvider)) {
           setSkillsProvider(settingsData.skillsProvider);
         }
       })
@@ -369,7 +366,10 @@ export default function MemorySkillsTab() {
             role="note"
             data-testid="memory-token-cost-warning"
           >
-            <span className="material-symbols-outlined text-[18px] leading-none mt-0.5" aria-hidden="true">
+            <span
+              className="material-symbols-outlined text-[18px] leading-none mt-0.5"
+              aria-hidden="true"
+            >
               info
             </span>
             <p className="text-xs leading-relaxed">
@@ -850,7 +850,27 @@ export default function MemorySkillsTab() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <button
+            type="button"
+            disabled={skillsProviderSaving}
+            onClick={() => saveSkillsProvider("apirouter")}
+            className={`flex flex-col items-start p-3 rounded-lg border text-left transition-all ${
+              skillsProvider === "apirouter"
+                ? "border-indigo-500/50 bg-indigo-500/5 ring-1 ring-indigo-500/20"
+                : "border-border/50 hover:border-border hover:bg-surface/30"
+            }`}
+          >
+            <p
+              className={`text-sm font-medium ${skillsProvider === "apirouter" ? "text-indigo-400" : ""}`}
+            >
+              API Router Skills
+            </p>
+            <p className="text-xs text-text-muted mt-0.5 leading-relaxed">
+              Pinned catalog cached locally. No API key, works offline once synced.
+            </p>
+          </button>
+
           <button
             type="button"
             disabled={skillsProviderSaving}

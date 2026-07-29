@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { getSettings } from "@/lib/db/settings";
 import { isAuthenticated } from "@/shared/utils/apiAuth";
 import { getSkillsProviderSetting } from "@/lib/skills/providerSettings";
+import { searchSkillCatalog } from "@/lib/db/skillCatalog";
 
 const POPULAR_BY_PROVIDER = {
   skillsmp: ["web-search", "file-reader", "sql-assistant", "devops-helper", "docs-assistant"],
   skillssh: ["git", "terminal", "postgres", "kubernetes", "playwright"],
+  apirouter: [] as string[],
 } as const;
+
+const APIROUTER_PREVIEW_LIMIT = 12;
 
 export async function GET(request: Request) {
   if (!(await isAuthenticated(request))) {
@@ -16,6 +20,27 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
     const provider = await getSkillsProviderSetting();
+
+    // API Router Skills is served from the local SQLite catalog, not an upstream
+    // marketplace API, so it never needs an API key. Dedicated routes live under
+    // /api/skills/apirouter; this branch keeps the shared marketplace endpoint
+    // consistent for callers that only know about /api/skills/marketplace.
+    if (provider === "apirouter") {
+      const { entries, total } = searchSkillCatalog({
+        query: q || undefined,
+        limit: APIROUTER_PREVIEW_LIMIT,
+      });
+      return NextResponse.json({
+        skills: entries.map((entry) => ({
+          id: entry.id,
+          name: entry.name,
+          description: entry.description || entry.displayName || entry.name,
+          version: entry.version || "1.0.0",
+          installCount: 0,
+        })),
+        total,
+      });
+    }
 
     // Return popular skills when query is empty
     if (!q) {

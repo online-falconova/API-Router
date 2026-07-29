@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card } from "@/shared/components";
-import type { SkillsProvider } from "@/lib/skills/providerSettings";
+import { SKILLS_PROVIDER_LABELS, type SkillsProvider } from "@/lib/skills/providerSettings";
+import { ApiRouterSkillsTab } from "./ApiRouterSkillsTab";
 
 interface MarketplaceSkill {
   name: string;
@@ -52,7 +53,9 @@ export function OmniMarketplaceTab({
       if (!res.ok) {
         setMpError((data as { error?: string }).error || t("marketplaceError"));
       } else {
-        setMpResults(Array.isArray(data) ? data : (data as { skills?: MarketplaceSkill[] }).skills || []);
+        setMpResults(
+          Array.isArray(data) ? data : (data as { skills?: MarketplaceSkill[] }).skills || []
+        );
       }
     } catch (err) {
       setMpError(err instanceof Error ? err.message : t("marketplaceError"));
@@ -135,35 +138,42 @@ export function OmniMarketplaceTab({
     }
   };
 
+  // API Router Skills has its own browser (local catalog, categories, security
+  // gate), so it replaces the shared search/results layout entirely. Declared
+  // after all hooks above, and no hooks follow, so hook order stays stable.
+  if (skillsProvider === "apirouter") {
+    return <ApiRouterSkillsTab onRefreshSkills={onRefreshSkills} />;
+  }
+
   return (
     <div className="grid gap-4">
       <Card>
         <h3 className="font-semibold mb-2">{t("skillsMarketplace")}</h3>
         <p className="text-sm text-text-muted mb-4">
           {t("activeProvider")}{" "}
-          <span className="font-medium">
-            {skillsProvider === "skillsmp" ? "SkillsMP" : "skills.sh"}
-          </span>
-          . {t("changeInSettings")}
+          <span className="font-medium">{SKILLS_PROVIDER_LABELS[skillsProvider]}</span>.{" "}
+          {t("changeInSettings")}
         </p>
         <div className="flex gap-2 mb-4">
           <input
             type="text"
             value={skillsProvider === "skillsmp" ? mpQuery : shQuery}
             onChange={(e) =>
-              skillsProvider === "skillsmp" ? setMpQuery(e.target.value) : setShQuery(e.target.value)
+              skillsProvider === "skillsmp"
+                ? setMpQuery(e.target.value)
+                : setShQuery(e.target.value)
             }
             onKeyDown={(e) =>
               e.key === "Enter" &&
               (skillsProvider === "skillsmp" ? searchMarketplace() : searchSkillsSh())
             }
             placeholder={t("searchMarketplacePlaceholder")}
-            className="flex-1 px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+            className="flex-1 px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
           <button
             onClick={() => (skillsProvider === "skillsmp" ? searchMarketplace() : searchSkillsSh())}
             disabled={skillsProvider === "skillsmp" ? mpLoading : shLoading}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-violet-500 text-white hover:bg-violet-600 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
           >
             {skillsProvider === "skillsmp"
               ? mpLoading
@@ -193,7 +203,7 @@ export function OmniMarketplaceTab({
                 <button
                   onClick={() => installFromMarketplace(skill)}
                   disabled={mpInstallingId === skill.name}
-                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-violet-500 text-white hover:bg-violet-600 disabled:opacity-50 transition-colors"
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
                 >
                   {mpInstallingId === skill.name ? t("installing") : t("installSkillButton")}
                 </button>
@@ -217,7 +227,7 @@ export function OmniMarketplaceTab({
                 <button
                   onClick={() => installFromSkillsSh(skill)}
                   disabled={shInstallingId === skill.id}
-                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-violet-500 text-white hover:bg-violet-600 disabled:opacity-50 transition-colors"
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
                 >
                   {shInstallingId === skill.id ? t("installing") : t("installSkillButton")}
                 </button>

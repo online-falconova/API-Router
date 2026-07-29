@@ -64,7 +64,7 @@ class SkillRegistry {
     enabled?: boolean;
     apiKeyId: string;
     mode?: "on" | "off" | "auto";
-    sourceProvider?: "skillsmp" | "skillssh" | "local";
+    sourceProvider?: "skillsmp" | "skillssh" | "apirouter" | "local";
     tags?: string[];
     installCount?: number;
   }): Promise<Skill> {
@@ -337,7 +337,9 @@ class SkillRegistry {
             enabled: row.enabled === 1,
             mode: row.mode === "off" || row.mode === "auto" ? row.mode : "on",
             sourceProvider:
-              row.source_provider === "skillsmp" || row.source_provider === "skillssh"
+              row.source_provider === "skillsmp" ||
+              row.source_provider === "skillssh" ||
+              row.source_provider === "apirouter"
                 ? row.source_provider
                 : row.source_provider
                   ? "local"
