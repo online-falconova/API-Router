@@ -39,6 +39,10 @@ export default function Input({
   const isPassword = type === "password";
   const [capsLockOn, setCapsLockOn] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  // When a password field is revealed, swap the native type to "text" so the
+  // value is shown. Non-password inputs are unaffected.
+  const effectiveType = isPassword && passwordVisible ? "text" : type;
 
   const detectCapsLock = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -91,7 +95,7 @@ export default function Input({
         )}
         <input
           id={inputId}
-          type={type}
+          type={effectiveType}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
@@ -120,11 +124,34 @@ export default function Input({
             // iOS zoom fix
             "text-[16px] sm:text-sm",
             icon && "pl-10",
+            // room for the show/hide toggle button
+            isPassword && "pr-10",
             error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : "",
             inputClassName
           )}
           {...props}
         />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setPasswordVisible((v) => !v)}
+            disabled={disabled}
+            tabIndex={-1}
+            aria-label={passwordVisible ? "Hide password" : "Show password"}
+            aria-pressed={passwordVisible}
+            title={passwordVisible ? "Hide password" : "Show password"}
+            className={cn(
+              "absolute inset-y-0 right-0 flex items-center pr-3 pl-2",
+              "text-text-muted/70 hover:text-text-main transition-colors",
+              "focus:outline-none focus-visible:text-text-main",
+              "disabled:opacity-50 disabled:cursor-not-allowed"
+            )}
+          >
+            <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+              {passwordVisible ? "visibility_off" : "visibility"}
+            </span>
+          </button>
+        )}
       </div>
       {showCapsLock && (
         <p

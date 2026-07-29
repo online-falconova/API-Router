@@ -227,9 +227,12 @@ export default function LoginPage() {
           >
             <div className="mb-10">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-[20px]">hub</span>
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand-logo.png"
+                  alt="API Router"
+                  className="h-10 w-auto object-contain"
+                />
                 <span className="text-xl font-semibold text-text-main tracking-tight">
                   API Router
                 </span>
