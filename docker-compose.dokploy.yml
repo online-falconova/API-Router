@@ -1,0 +1,184 @@
+# ──────────────────────────────────────────────────────────────────────
+#  OmniRoute — Dokploy deployment
+# ──────────────────────────────────────────────────────────────────────
+#
+#  Designed for Dokploy (Docker Compose service type). Differences from
+#  docker-compose.yml / docker-compose.prod.yml:
+#
+#    • Uses `expose` instead of `ports` — Traefik already owns host 80/443,
+#      and publishing to the host is unnecessary (and conflict-prone) on a
+#      shared VPS. Dokploy injects the Traefik labels for you at deploy time
+#      based on the domains you add in the UI.
+#    • Services join the external `dokploy-network` so Traefik can reach them.
+#    • Named volumes without a hardcoded `name:` so Dokploy namespaces them
+#      per-project instead of colliding with other stacks.
+#    • Secrets are declared with `${VAR:?}` so a misconfigured deploy fails
+#      fast instead of booting with a weak/blank credential.
+#    • Redis is reachable only inside the compose network and requires a
+#      password — it is never published to the host.
+#
+#  ── Setup ───────────────────────────────────────────────────────────
+#  1. Dokploy → Create Service → Compose, point it at this repo and set
+#     "Compose File" to `docker-compose.dokploy.yml`.
+#  2. Environment tab — set the required variables:
+#
+#       PUBLIC_URL=https://omniroute.example.com
+#       JWT_SECRET=<openssl rand -base64 48>
+#       API_KEY_SECRET=<openssl rand -hex 32>
+#       INITIAL_PASSWORD=<strong password, change after first login>
+#       REDIS_PASSWORD=<openssl rand -hex 24>
+#
+#     Recommended (enables SQLite encryption at rest — keep a backup of it,
+#     losing this key makes the database unreadable):
+#
+#       STORAGE_ENCRYPTION_KEY=<openssl rand -hex 32>
+#
+#  3. Domains tab — add your domain, service `omniroute`, container port
+#     `20128`, HTTPS on with Let's Encrypt.
+#  4. Deploy. First boot runs SQLite migrations, so give it ~1 min.
+#
+#  ── Notes ───────────────────────────────────────────────────────────
+#  • Build RAM: the Next.js build asks for ~4 GB. On a small VPS lower
+#    OMNIROUTE_BUILD_MEMORY_MB, or build elsewhere and deploy an image.
+#  • `target: runner-base` is the lean image. Switch to `runner-web` only if
+#    you need the web-cookie providers (gemini-web, claude-web,
+#    claude-turnstile) — it adds Chromium and ~300 MB.
+#  • If you enable Dokploy's "Isolated Deployments", delete the `networks:`
+#    blocks below — Dokploy handles connectivity itself in that mode.
+#  • The live-monitoring WebSocket listens on 20132. It is exposed on the
+#    compose network only; add a second Dokploy domain pointing at port
+#    20132 if you want the live dashboard, and append that origin to
+#    LIVE_WS_ALLOWED_ORIGINS.
+# ──────────────────────────────────────────────────────────────────────
+
+services:
+  omniroute:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner-base
+      args:
+        OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
+        OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
+    image: omniroute:dokploy
+    restart: unless-stopped
+    stop_grace_period: 40s
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    # Traefik reaches these over the compose network — nothing is bound to the host.
+    expose:
+      - "20128" # Dashboard + API (single-port mode)
+      - "20132" # Live monitoring WebSocket
+
+    environment:
+      NODE_ENV: production
+      CONTAINER_HOST: docker
+
+      # ── Storage ──
+      # Must match the volume mount below.
+      DATA_DIR: /app/data
+      # Optional but recommended: encrypts the SQLite database at rest.
+      STORAGE_ENCRYPTION_KEY: ${STORAGE_ENCRYPTION_KEY:-}
+      STORAGE_ENCRYPTION_KEY_VERSION: ${STORAGE_ENCRYPTION_KEY_VERSION:-v1}
+
+      # ── Required secrets — deploy aborts if unset ──
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in the Dokploy environment (openssl rand -base64 48)}
+      API_KEY_SECRET: ${API_KEY_SECRET:?set API_KEY_SECRET in the Dokploy environment (openssl rand -hex 32)}
+      INITIAL_PASSWORD: ${INITIAL_PASSWORD:?set INITIAL_PASSWORD in the Dokploy environment, then change it after first login}
+
+      # ── Network ──
+      PORT: 20128
+      DASHBOARD_PORT: 20128
+      OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
+      # Internal loopback URL for server-side sync jobs — keep it loopback even
+      # though the app is publicly proxied.
+      BASE_URL: http://localhost:20128
+      # Public origin, used for OAuth callbacks, dashboard links and cookies.
+      NEXT_PUBLIC_BASE_URL: ${PUBLIC_URL:?set PUBLIC_URL to your public https URL, e.g. https://omniroute.example.com}
+
+      # ── Live monitoring WebSocket ──
+      LIVE_WS_PORT: 20132
+      LIVE_WS_HOST: 0.0.0.0
+      # Browsers may only open the live socket from your public origin.
+      LIVE_WS_ALLOWED_ORIGINS: ${PUBLIC_URL}
+      # Extra hostnames (LAN / Tailscale), comma-separated. Usually left empty.
+      LIVE_WS_ALLOWED_HOSTS: ${LIVE_WS_ALLOWED_HOSTS:-}
+
+      # ── Security posture for a publicly reachable deployment ──
+      # TLS is terminated by Traefik, so session cookies must be Secure.
+      AUTH_COOKIE_SECURE: "true"
+      # Every /v1/* proxy call needs an API key. Do not relax this on a public host.
+      REQUIRE_API_KEY: ${REQUIRE_API_KEY:-true}
+      # Never echo full key values back into the dashboard UI.
+      ALLOW_API_KEY_REVEAL: "false"
+      # Per-deployment salt so machine IDs are not shared across instances.
+      MACHINE_ID_SALT: ${MACHINE_ID_SALT:-omniroute-dokploy}
+      # No CORS origins by default: the dashboard is same-origin and uses CSRF
+      # protection. Add explicit origins only if a browser client needs them.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      CORS_ALLOW_ALL: "false"
+
+      # ── Rate limiting (Redis-backed, password-protected, network-internal) ──
+      REDIS_URL: redis://default:${REDIS_PASSWORD:?set REDIS_PASSWORD in the Dokploy environment (openssl rand -hex 24)}@redis:6379
+
+    volumes:
+      - omniroute-data:/app/data
+
+    # The image already defines a HEALTHCHECK (node healthcheck.mjs); this only
+    # stretches start_period, since first boot runs SQLite migrations.
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.mjs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    networks:
+      - dokploy-network
+
+  redis:
+    image: docker.io/library/redis:7-alpine
+    restart: unless-stopped
+    # Not published and not exposed to the host — only the compose network.
+    command:
+      - redis-server
+      - --save
+      - "60"
+      - "1"
+      - --loglevel
+      - warning
+      - --requirepass
+      - ${REDIS_PASSWORD:?set REDIS_PASSWORD in the Dokploy environment (openssl rand -hex 24)}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", 'redis-cli --no-auth-warning -a "$$REDIS_PASSWORD" ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - dokploy-network
+
+volumes:
+  # No explicit `name:` — Dokploy prefixes these per project so stacks stay isolated.
+  omniroute-data:
+  redis-data:
+
+networks:
+  dokploy-network:
+    external: true
