@@ -20,8 +20,8 @@ export default function Navigation() {
           onClick={() => router.push("/")}
           aria-label={t("navigateHome")}
         >
-          <div className="size-8 rounded bg-linear-to-br from-[#DC2626] to-[#B91C1C] flex items-center justify-center text-white">
-            <OmniRouteLogo size={20} className="text-white" />
+          <div className="flex items-center justify-center shrink-0">
+            <OmniRouteLogo size={40} />
           </div>
           <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight truncate sm:max-w-none max-w-[160px]">
             {t("brandName")}

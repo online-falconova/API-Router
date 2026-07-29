@@ -501,15 +501,15 @@ export default function Sidebar({
             prefetch={false}
             className={cn("flex items-center", collapsed ? "justify-center" : "gap-2.5")}
           >
-            <div className="flex items-center justify-center size-8 rounded bg-linear-to-br from-[#DC2626] to-[#B91C1C] shrink-0">
+            <div className="flex items-center justify-center size-10 shrink-0">
               {customLogo ? (
                 <img
                   src={customLogo}
                   alt={customAppName || APP_CONFIG.name}
-                  className="size-5 object-contain"
+                  className="size-10 object-contain"
                 />
               ) : (
-                <OmniRouteLogo size={18} className="text-white" />
+                <OmniRouteLogo size={40} />
               )}
             </div>
             {!collapsed && (
