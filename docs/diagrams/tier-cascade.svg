@@ -1,8 +1,8 @@
 <svg viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OmniRoute request flow — auto-fallback cascade across 4 provider tiers">
   <defs>
     <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#e54d5e" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#e54d5e" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#dc2626" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="bgGlow" cx="50%" cy="35%" r="60%">
       <stop offset="0%" stop-color="#6366f1" stop-opacity="0.13"/>
@@ -26,7 +26,7 @@
     <path id="pC2" d="M 472,548 L 720,548"/>
     <path id="pC3" d="M 764,548 L 1012,548"/>
     <linearGradient id="gradBrand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e54d5e"/>
+      <stop offset="0%" stop-color="#dc2626"/>
       <stop offset="100%" stop-color="#a855f7"/>
     </linearGradient>
     <pattern id="gridPaper" width="32" height="32" patternUnits="userSpaceOnUse">
@@ -72,13 +72,13 @@
   <rect x="240" y="170" width="720" height="120" rx="14" fill="url(#cardGrad)" stroke="#8b5cf6" stroke-width="1.2" stroke-opacity="0.45"/>
   <!-- mini hub glyph -->
   <g transform="translate(258, 188)">
-    <circle cx="42" cy="42" r="34" fill="none" stroke="#e54d5e" stroke-width="1" opacity="0.35" stroke-dasharray="3 7">
+    <circle cx="42" cy="42" r="34" fill="none" stroke="#dc2626" stroke-width="1" opacity="0.35" stroke-dasharray="3 7">
       <animateTransform attributeName="transform" type="rotate" from="0 42 42" to="360 42 42" dur="30s" repeatCount="indefinite"/>
     </circle>
     <circle cx="42" cy="42" r="24" fill="url(#hubGlow)">
       <animate attributeName="r" values="22;30;22" dur="3.2s" repeatCount="indefinite"/>
     </circle>
-    <g stroke="#e54d5e" stroke-width="5" stroke-linecap="round" fill="none">
+    <g stroke="#dc2626" stroke-width="5" stroke-linecap="round" fill="none">
       <line x1="22" y1="42" x2="38" y2="42"/>
       <path d="M 39 42 C 52 42, 54 26, 66 24"/>
       <path d="M 39 42 C 54 42, 56 42, 68 42"/>

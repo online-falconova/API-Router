@@ -46,8 +46,8 @@ Każdy kolor brand i surface już pasuje do strony **wartością** (różnią si
 
 | Pojęcie                    | Token strony (`tokens.css`)                 | Token dashboardu (`globals.css`) | Zgodność           |
 | -------------------------- | ------------------------------------------- | -------------------------------- | ------------------ |
-| primary                    | `--primary #e54d5e`                         | `--color-primary #e54d5e`        | ✅                 |
-| primary-hover              | `--primary-hover #c93d4e`                   | `--color-primary-hover #c93d4e`  | ✅                 |
+| primary                    | `--primary #dc2626`                         | `--color-primary #dc2626`        | ✅                 |
+| primary-hover              | `--primary-hover #b91c1c`                   | `--color-primary-hover #b91c1c`  | ✅                 |
 | accent                     | `--accent #6366f1`                          | `--color-accent #6366f1`         | ✅                 |
 | accent-2                   | `--accent-2 #8b5cf6`                        | `--color-accent-hover #8b5cf6`   | ✅ (przemianowane) |
 | accent-3                   | `--accent-3 #a855f7`                        | `--color-accent-light #a855f7`   | ✅ (przemianowane) |
@@ -102,7 +102,7 @@ body::before {
 
 ### 4.2 Precedens już w codebase
 
-`src/app/landing/page.tsx:16-26` **już implementuje tę samą siatkę per-page** — ale z **czerwonymi** liniami (`#E54D5E`, opacity `0.06`) na **50px**, plus animowane orby. Wzorzec jest więc sprawdzony w produkcie; ta praca promuje go do **globalnej, theme-aware** tapety.
+`src/app/landing/page.tsx:16-26` **już implementuje tę samą siatkę per-page** — ale z **czerwonymi** liniami (`#DC2626`, opacity `0.06`) na **50px**, plus animowane orby. Wzorzec jest więc sprawdzony w produkcie; ta praca promuje go do **globalnej, theme-aware** tapety.
 
 ### 4.3 Dodane tokeny (w `globals.css`)
 

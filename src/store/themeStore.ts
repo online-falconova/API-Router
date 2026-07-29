@@ -19,7 +19,7 @@ const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
       theme: THEME_CONFIG.defaultTheme,
-      colorTheme: "coral",
+      colorTheme: "red",
       customColor: "#3b82f6",
 
       setTheme: (theme) => {
@@ -53,6 +53,20 @@ const useThemeStore = create<ThemeState>()(
     }),
     {
       name: THEME_CONFIG.storageKey,
+      // v1: brand primary moved from coral (#e54d5e) to red (#dc2626). Existing
+      // installs have `colorTheme: "coral"` persisted in localStorage, which is
+      // re-applied over --color-primary on boot and would keep showing the old
+      // coral. Move those to the new brand default; anyone who deliberately
+      // wants coral can still pick it in Settings → Appearance.
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<ThemeState> | undefined;
+        if (!state) return state as ThemeState;
+        if (version < 1 && state.colorTheme === "coral") {
+          return { ...state, colorTheme: "red" } as ThemeState;
+        }
+        return state as ThemeState;
+      },
     }
   )
 );
@@ -60,7 +74,8 @@ const useThemeStore = create<ThemeState>()(
 export const COLOR_THEMES: Record<string, string> = {
   coral: "#e54d5e",
   blue: "#3b82f6",
-  red: "#ef4444",
+  // Brand default — mirrors --color-primary in globals.css. Keep the two in sync.
+  red: "#dc2626",
   green: "#22c55e",
   violet: "#8b5cf6",
   orange: "#f97316",
@@ -89,7 +104,7 @@ function applyColorTheme(colorTheme: string, customColor: string) {
   const baseColor =
     colorTheme === "custom"
       ? normalizeHexColor(customColor)
-      : COLOR_THEMES[colorTheme] || COLOR_THEMES.coral;
+      : COLOR_THEMES[colorTheme] || COLOR_THEMES.red;
   const hoverColor = shadeHexColor(baseColor, -0.14);
 
   root.style.setProperty("--color-primary", baseColor);

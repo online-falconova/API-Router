@@ -20,7 +20,7 @@ export default function Navigation() {
           onClick={() => router.push("/")}
           aria-label={t("navigateHome")}
         >
-          <div className="size-8 rounded bg-linear-to-br from-[#E54D5E] to-[#C93D4E] flex items-center justify-center text-white">
+          <div className="size-8 rounded bg-linear-to-br from-[#DC2626] to-[#B91C1C] flex items-center justify-center text-white">
             <OmniRouteLogo size={20} className="text-white" />
           </div>
           <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight truncate sm:max-w-none max-w-[160px]">
@@ -65,7 +65,7 @@ export default function Navigation() {
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button
             onClick={() => router.push("/dashboard")}
-            className="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 bg-[#E54D5E] hover:bg-[#C93D4E] transition-all text-white text-sm font-bold shadow-[0_0_15px_rgba(229,77,94,0.4)] hover:shadow-[0_0_20px_rgba(229,77,94,0.6)]"
+            className="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 bg-[#DC2626] hover:bg-[#B91C1C] transition-all text-white text-sm font-bold shadow-[0_0_15px_rgba(220, 38, 38,0.4)] hover:shadow-[0_0_20px_rgba(220, 38, 38,0.6)]"
           >
             {t("getStarted")}
           </button>
@@ -116,7 +116,7 @@ export default function Navigation() {
             </a>
             <button
               onClick={() => router.push("/dashboard")}
-              className="h-9 rounded-lg bg-[#E54D5E] hover:bg-[#C93D4E] text-white text-sm font-bold"
+              className="h-9 rounded-lg bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-bold"
             >
               {t("getStarted")}
             </button>

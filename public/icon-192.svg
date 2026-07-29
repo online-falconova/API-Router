@@ -18,8 +18,8 @@
     <line x1="96" y1="114" x2="96" y2="162" stroke="white" stroke-width="7" stroke-linecap="round" />
     <defs>
         <linearGradient id="gradient" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#E54D5E" />
-            <stop offset="1" stop-color="#C93D4E" />
+            <stop stop-color="#DC2626" />
+            <stop offset="1" stop-color="#B91C1C" />
         </linearGradient>
     </defs>
 </svg>

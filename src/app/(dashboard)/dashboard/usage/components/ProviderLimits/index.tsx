@@ -906,10 +906,10 @@ export default function ProviderLimits({
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer"
                   style={{
                     border: active
-                      ? "1px solid var(--color-primary, #E54D5E)"
+                      ? "1px solid var(--color-primary, #DC2626)"
                       : "1px solid var(--color-border)",
-                    background: active ? "rgba(229,77,94,0.1)" : "transparent",
-                    color: active ? "var(--color-primary, #E54D5E)" : "var(--color-text-muted)",
+                    background: active ? "rgba(220, 38, 38,0.1)" : "transparent",
+                    color: active ? "var(--color-primary, #DC2626)" : "var(--color-text-muted)",
                   }}
                 >
                   <span>{tr(type.labelKey, type.fallback)}</span>
@@ -934,10 +934,10 @@ export default function ProviderLimits({
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer"
                   style={{
                     border: active
-                      ? "1px solid var(--color-primary, #E54D5E)"
+                      ? "1px solid var(--color-primary, #DC2626)"
                       : "1px solid var(--color-border)",
-                    background: active ? "rgba(229,77,94,0.1)" : "transparent",
-                    color: active ? "var(--color-primary, #E54D5E)" : "var(--color-text-muted)",
+                    background: active ? "rgba(220, 38, 38,0.1)" : "transparent",
+                    color: active ? "var(--color-primary, #DC2626)" : "var(--color-text-muted)",
                   }}
                 >
                   <span>{tier.label || t(tier.labelKey!)}</span>
@@ -992,10 +992,10 @@ export default function ProviderLimits({
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold cursor-pointer"
                     style={{
                       border: active
-                        ? "1px solid var(--color-primary, #E54D5E)"
+                        ? "1px solid var(--color-primary, #DC2626)"
                         : "1px solid var(--color-border)",
-                      background: active ? "rgba(229,77,94,0.1)" : "transparent",
-                      color: active ? "var(--color-primary, #E54D5E)" : "var(--color-text-muted)",
+                      background: active ? "rgba(220, 38, 38,0.1)" : "transparent",
+                      color: active ? "var(--color-primary, #DC2626)" : "var(--color-text-muted)",
                     }}
                   >
                     <span>{label}</span>

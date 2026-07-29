@@ -46,8 +46,8 @@ Every brand color and surface already matches the site **by value** (only the na
 
 | Concept                    | Site token (`tokens.css`)                   | Dashboard token (`globals.css`) | Match        |
 | -------------------------- | ------------------------------------------- | ------------------------------- | ------------ |
-| primary                    | `--primary #e54d5e`                         | `--color-primary #e54d5e`       | ✅           |
-| primary-hover              | `--primary-hover #c93d4e`                   | `--color-primary-hover #c93d4e` | ✅           |
+| primary                    | `--primary #dc2626`                         | `--color-primary #dc2626`       | ✅           |
+| primary-hover              | `--primary-hover #b91c1c`                   | `--color-primary-hover #b91c1c` | ✅           |
 | accent                     | `--accent #6366f1`                          | `--color-accent #6366f1`        | ✅           |
 | accent-2                   | `--accent-2 #8b5cf6`                        | `--color-accent-hover #8b5cf6`  | ✅ (renamed) |
 | accent-3                   | `--accent-3 #a855f7`                        | `--color-accent-light #a855f7`  | ✅ (renamed) |
@@ -102,7 +102,7 @@ body::before {
 
 ### 4.2 Precedent already in the codebase
 
-`src/app/landing/page.tsx:16-26` **already implements this same grid per-page** — but with **red** lines (`#E54D5E`, opacity `0.06`) at **50px**, plus animated orbs. So the pattern is proven in the product; this work promotes it to a **global, theme-aware** wallpaper.
+`src/app/landing/page.tsx:16-26` **already implements this same grid per-page** — but with **red** lines (`#DC2626`, opacity `0.06`) at **50px**, plus animated orbs. So the pattern is proven in the product; this work promotes it to a **global, theme-aware** wallpaper.
 
 ### 4.3 Tokens added (in `globals.css`)
 
