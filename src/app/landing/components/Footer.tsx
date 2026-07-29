@@ -91,7 +91,7 @@ export default function Footer() {
             <h4 className="font-bold text-white">{t("legal")}</h4>
             <a
               className="text-gray-400 hover:text-[#DC2626] text-sm transition-colors"
-              href="https://github.com/diegosouzapw/OmniRoute/blob/main/LICENSE"
+              href="https://github.com/cloud-falconova/API-Router/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
             >

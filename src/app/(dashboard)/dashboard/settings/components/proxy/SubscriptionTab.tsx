@@ -443,7 +443,7 @@ export default function SubscriptionTab() {
                       该订阅有 {needsCoreNodes.length} 个节点需要本地代理内核（SS / VMess / Trojan / VLESS 等），当前未被路由。
                     </p>
                     <p>
-                      这些协议无法被 OmniRoute 直接转发。请在本机启动一个 <code>sing-box</code> 或{" "}
+                      这些协议无法被 API Router 直接转发。请在本机启动一个 <code>sing-box</code> 或{" "}
                       <code>clash（Clash.Meta）</code> 内核，并把它暴露为一个 SOCKS5/HTTP 端点，然后在「编辑」中填入该端点（仅接受 127.0.0.1 / localhost）。
                     </p>
                     <div className="flex flex-wrap items-center gap-2">

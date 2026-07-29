@@ -113,7 +113,7 @@ export async function generateMetadata(props: {
   if (!page) return {};
 
   return {
-    title: `${page.data.title} — OmniRoute Docs`,
-    description: page.data.description ?? `OmniRoute documentation: ${page.data.title}`,
+    title: `${page.data.title} — API Router Docs`,
+    description: page.data.description ?? `API Router documentation: ${page.data.title}`,
   };
 }

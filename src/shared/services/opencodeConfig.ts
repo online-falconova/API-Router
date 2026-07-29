@@ -66,7 +66,7 @@ export const buildOpenCodeProviderConfig = ({
 
   return {
     npm: "@ai-sdk/openai-compatible",
-    name: "OmniRoute",
+    name: "API Router",
     options: {
       baseURL: normalizedBaseUrl,
       apiKey: apiKey || "sk_omniroute",

@@ -23,7 +23,7 @@ function toHex(bytes: Uint8Array): string {
 }
 
 /**
- * Rename a Node process title so OmniRoute is identifiable in `ps`/`htop`
+ * Rename a Node process title so API Router is identifiable in `ps`/`htop`
  * instead of the generic Next.js standalone server name.
  *
  * Only rewrites titles that start with "next-server", preserving any
@@ -245,7 +245,7 @@ export async function scanComboModelNameCollisionsAtBoot(): Promise<void> {
 export async function registerNodejs(): Promise<void> {
   markServerStarting();
 
-  // Rename the process title so OmniRoute is identifiable in ps/htop instead
+  // Rename the process title so API Router is identifiable in ps/htop instead
   // of the generic "next-server" standalone server name.
   process.title = renameProcessTitle(process.title);
 

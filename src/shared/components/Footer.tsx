@@ -154,7 +154,7 @@ export default function Footer() {
               Privacy
             </Link>
             <a
-              href="https://github.com/diegosouzapw/OmniRoute/blob/main/LICENSE"
+              href="https://github.com/cloud-falconova/API-Router/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors"

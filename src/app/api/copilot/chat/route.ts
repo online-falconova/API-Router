@@ -19,8 +19,8 @@ const copilotRequestSchema = z.object({
 /**
  * POST /api/copilot/chat
  *
- * OmniRoute Copilot chat endpoint.
- * Accepts user messages about OmniRoute configuration and returns
+ * API Router Copilot chat endpoint.
+ * Accepts user messages about API Router configuration and returns
  * tool-based responses + AI guidance.
  *
  * Body: { messages: [{ role: "user"|"assistant"|"system", content: string }] }

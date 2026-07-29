@@ -3,7 +3,7 @@
  *
  * The subscription URL is fetched server-side (see `subscriptionService
  * .fetchSubscriptionContent`). Without a guard, an operator — or a compromised
- * subscription link — could point OmniRoute at internal services or cloud
+ * subscription link — could point API Router at internal services or cloud
  * metadata (SSRF). Only http/https to non-internal hosts are allowed:
  * loopback / private / link-local (incl. 169.254.0.0/16 cloud metadata) /
  * unspecified addresses are blocked.

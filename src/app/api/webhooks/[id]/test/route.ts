@@ -88,7 +88,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
 
     const kind = webhook.kind ?? "custom";
     const testData = {
-      message: "Test webhook delivery from OmniRoute",
+      message: "Test webhook delivery from API Router",
       webhookId: webhook.id,
     };
     const testPayload = { event: "test.ping", timestamp: new Date().toISOString(), data: testData };

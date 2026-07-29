@@ -2,7 +2,7 @@
  * Plugin SDK — typed API for plugin developers.
  *
  * Provides `definePlugin()` factory and re-exports all types needed
- * to build OmniRoute plugins.
+ * to build API Router plugins.
  *
  * @module plugins/sdk
  */
@@ -34,7 +34,7 @@ export interface PluginDefinition {
 }
 
 /**
- * Define an OmniRoute plugin with type safety.
+ * Define an API Router plugin with type safety.
  *
  * @example
  * ```ts

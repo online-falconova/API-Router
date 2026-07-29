@@ -24,7 +24,7 @@ const getJcodeConfigPath = (): string =>
 const getJcodeDir = () => path.dirname(getJcodeConfigPath());
 
 /**
- * Check if the config file contains OmniRoute settings.
+ * Check if the config file contains API Router settings.
  */
 const hasOmniRouteConfig = (settings: Record<string, unknown> | null): boolean => {
   if (!settings) return false;
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST — write OmniRoute settings to jcode config.json
+// POST — write API Router settings to jcode config.json
 export async function POST(request: Request) {
   const authError = await requireCliToolsAuth(request);
   if (authError) return authError;
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       /* No existing config */
     }
 
-    // Merge OmniRoute settings (jcode uses OpenAI-compatible config)
+    // Merge API Router settings (jcode uses OpenAI-compatible config)
     const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
     const updated: Record<string, unknown> = {
       ...existing,
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE — remove OmniRoute settings from jcode config
+// DELETE — remove API Router settings from jcode config
 export async function DELETE(request: Request) {
   const authError = await requireCliToolsAuth(request);
   if (authError) return authError;
@@ -219,7 +219,7 @@ export async function DELETE(request: Request) {
       /* non-critical */
     }
 
-    return NextResponse.json({ success: true, message: "jcode OmniRoute settings removed" });
+    return NextResponse.json({ success: true, message: "jcode API Router settings removed" });
   } catch (err) {
     return NextResponse.json(
       { error: { message: sanitizeErrorMessage(err) } },

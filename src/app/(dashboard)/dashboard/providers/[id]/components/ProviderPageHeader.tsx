@@ -48,7 +48,7 @@ export default function ProviderPageHeader({
   const kimiPartnerLinkNote = providerText(
     t,
     "kimiPartnerLinkNote",
-    "Partner link — supports OmniRoute at no extra cost to you"
+    "Partner link — supports API Router at no extra cost to you"
   );
 
   return (

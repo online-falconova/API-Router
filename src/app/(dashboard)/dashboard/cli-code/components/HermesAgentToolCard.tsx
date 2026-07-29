@@ -183,13 +183,13 @@ export default function HermesAgentToolCard({
     }
   };
 
-  const setRoleSelection = (roleId: string, model: string, provider = "OmniRoute") => {
+  const setRoleSelection = (roleId: string, model: string, provider = "API Router") => {
     setSelections((prev) => ({ ...prev, [roleId]: { model, provider } }));
   };
 
   const applyToAll = (model: string) => {
     const newSel: Record<string, RoleSelection> = {};
-    HERMES_ROLES.forEach((r) => (newSel[r.id] = { model, provider: "OmniRoute" }));
+    HERMES_ROLES.forEach((r) => (newSel[r.id] = { model, provider: "API Router" }));
     setSelections(newSel);
   };
 
@@ -288,7 +288,7 @@ export default function HermesAgentToolCard({
   // Effective per-role data for count + collapsed status.
   // Priority: pending selections > freshly loaded currentRoles > batchStatus from detector (phase 3)
   const effectiveRoles = React.useMemo(() => {
-    // If user has pending changes, treat selected roles as OmniRoute
+    // If user has pending changes, treat selected roles as API Router
     if (Object.keys(selections).length > 0) {
       const map: Record<string, any> = {};
       HERMES_ROLES.forEach((r) => {
@@ -312,9 +312,9 @@ export default function HermesAgentToolCard({
     return batchStatus?.hermesAgentRoles || {};
   }, [selections, currentRoles, batchStatus]);
 
-  // Count of roles that are (or will be) routed via OmniRoute
+  // Count of roles that are (or will be) routed via API Router
   const configuredRolesCount = HERMES_ROLES.filter((role) => {
-    // Pending selection always counts as OmniRoute intent
+    // Pending selection always counts as API Router intent
     if (selections[role.id]) return true;
 
     const info = effectiveRoles[role.id];
@@ -423,14 +423,14 @@ export default function HermesAgentToolCard({
               const displayedModel = sel?.model || current?.model;
 
               // Badge logic per user's spec:
-              // - If user has selected something in this session (pending): show as via OmniRoute
-              // - Else if current from disk: show real provider name + "(not OmniRoute)" or "OmniRoute"
+              // - If user has selected something in this session (pending): show as via API Router
+              // - Else if current from disk: show real provider name + "(not API Router)" or "API Router"
               let badge: { label: string; pending: boolean; outsideOmniRoute: boolean } | null =
                 null;
 
               if (sel) {
-                // pending change made via the Select modal / quick apply → will be routed via OmniRoute
-                const prov = sel.provider || "OmniRoute";
+                // pending change made via the Select modal / quick apply → will be routed via API Router
+                const prov = sel.provider || "API Router";
                 badge = {
                   label: t("hermesViaOmniRoute", { provider: prov }),
                   pending: true,
@@ -443,7 +443,7 @@ export default function HermesAgentToolCard({
                   (current?.base_url || "").includes("localhost");
 
                 if (isOmni) {
-                  badge = { label: "OmniRoute", pending: false, outsideOmniRoute: false };
+                  badge = { label: "API Router", pending: false, outsideOmniRoute: false };
                 } else {
                   const realProvider = current.provider || t("other");
                   badge = {
@@ -596,7 +596,7 @@ export default function HermesAgentToolCard({
             if (modelValue) {
               // Capture a useful provider label from the modal selection when available
               const prov =
-                (model && (model.provider || model.providerId || model.group)) || "OmniRoute";
+                (model && (model.provider || model.providerId || model.group)) || "API Router";
               setRoleSelection(modalRole, modelValue, prov);
             }
           }

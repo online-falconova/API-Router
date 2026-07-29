@@ -18,7 +18,7 @@ export const normalizeQwenCodeBaseUrl = (value: unknown): string => {
 };
 
 /**
- * Identifies only entries owned by OmniRoute. Generic custom endpoints are not
+ * Identifies only entries owned by API Router. Generic custom endpoints are not
  * considered managed: users can keep any other OpenAI-compatible provider.
  */
 export const isManagedQwenCodeModel = (value: unknown): boolean => {
@@ -27,7 +27,7 @@ export const isManagedQwenCodeModel = (value: unknown): boolean => {
 
   return (
     typeof value.name === "string" &&
-    value.name.endsWith(" (OmniRoute)") &&
+    value.name.endsWith(" (API Router)") &&
     typeof value.envKey === "string" &&
     LEGACY_ENV_KEYS.has(value.envKey)
   );
@@ -90,14 +90,14 @@ export const buildQwenCodeModel = ({
 
   return {
     id: normalizedModel,
-    name: `${String(modelName || normalizedModel).trim()} (OmniRoute)`,
+    name: `${String(modelName || normalizedModel).trim()} (API Router)`,
     envKey: QWEN_CODE_ENV_KEY,
     baseUrl: normalizedBaseUrl,
   };
 };
 
 /**
- * Merge one OmniRoute model into Qwen Code's current V4 settings contract.
+ * Merge one API Router model into Qwen Code's current V4 settings contract.
  * `modelProviders.openai` is a bare ModelConfig[] array. Other settings and
  * user-owned provider entries are preserved.
  */

@@ -312,7 +312,7 @@ function stripLatestAlias(modelId: string | null): string | null {
 }
 
 function reverseModelsDevProviders(provider: string): string[] {
-  // models.dev may store capabilities under a different OmniRoute provider id
+  // models.dev may store capabilities under a different API Router provider id
   // that also maps from the same upstream models.dev provider. Build reverse
   // candidates from MODELS_DEV_PROVIDER_MAP (e.g. openai ↔ cx).
   //

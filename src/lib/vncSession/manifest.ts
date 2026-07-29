@@ -11,7 +11,7 @@ export interface VncProviderEntry {
   name: string;
   /** Login page opened by the browser container. */
   url: string;
-  /** Canonical OmniRoute credential contract for this provider. */
+  /** Canonical API Router credential contract for this provider. */
   requirement: Exclude<WebSessionCredentialRequirement, { kind: "none" }>;
 }
 

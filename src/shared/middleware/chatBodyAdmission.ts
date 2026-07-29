@@ -54,7 +54,7 @@ export interface ChatAdmissionLease {
 
 /**
  * Process-local heavyweight reservation. The capacity check and increment execute in one
- * synchronous JavaScript turn, making acquisition atomic within an OmniRoute process.
+ * synchronous JavaScript turn, making acquisition atomic within an API Router process.
  * Queueing is intentionally separate: unavailable capacity is a retryable 503.
  */
 export class ChatAdmissionController {

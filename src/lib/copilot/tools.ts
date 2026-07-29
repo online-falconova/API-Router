@@ -1,7 +1,7 @@
 /**
- * OmniRoute Copilot — Tool definitions
+ * API Router Copilot — Tool definitions
  *
- * Tools the copilot can execute to configure OmniRoute on behalf of the user,
+ * Tools the copilot can execute to configure API Router on behalf of the user,
  * query the codebase via CodeGraph, and execute CLI commands for full control.
  */
 
@@ -254,7 +254,7 @@ export const COPILOT_TOOLS: CopilotTool[] = [
   {
     name: "searchCodeGraph",
     description:
-      "Search for symbols in the OmniRoute codebase by name (functions, classes, types, variables). Use this to understand how the app works internally.",
+      "Search for symbols in the API Router codebase by name (functions, classes, types, variables). Use this to understand how the app works internally.",
     parameters: [
       {
         name: "query",
@@ -297,7 +297,7 @@ export const COPILOT_TOOLS: CopilotTool[] = [
   {
     name: "findCallees",
     description:
-      "Find all functions/symbols that a specific function calls. Useful for understanding dependencies and code flow within OmniRoute.",
+      "Find all functions/symbols that a specific function calls. Useful for understanding dependencies and code flow within API Router.",
     parameters: [
       {
         name: "symbol",
@@ -367,7 +367,7 @@ export const COPILOT_TOOLS: CopilotTool[] = [
   {
     name: "runOmniRouteCli",
     description:
-      "Execute an 'omniroute' CLI command to configure or query the OmniRoute app. Gives complete control over the app — use for advanced operations not covered by other tools. Common commands: omniroute list-keys, omniroute switch-combo [id], omniroute set-budget 10, omniroute set-strategy [id] priority, omniroute health, omniroute mcp (starts MCP server), omniroute db-health, omniroute reset-password.",
+      "Execute an 'omniroute' CLI command to configure or query the API Router app. Gives complete control over the app — use for advanced operations not covered by other tools. Common commands: omniroute list-keys, omniroute switch-combo [id], omniroute set-budget 10, omniroute set-strategy [id] priority, omniroute health, omniroute mcp (starts MCP server), omniroute db-health, omniroute reset-password.",
     parameters: [
       {
         name: "command",
@@ -382,7 +382,7 @@ export const COPILOT_TOOLS: CopilotTool[] = [
       if (!cmd) return "Please provide a command to execute.";
 
       const cliPath = getOmniRouteCliPath();
-      if (!cliPath) return "omniroute CLI not found in PATH. Install OmniRoute first.";
+      if (!cliPath) return "omniroute CLI not found in PATH. Install API Router first.";
 
       try {
         const trimmedCmd = cmd.trim();

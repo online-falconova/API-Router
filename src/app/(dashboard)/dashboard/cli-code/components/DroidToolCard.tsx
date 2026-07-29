@@ -46,7 +46,7 @@ export default function DroidToolCard({
   const cliReady = !!(droidStatus?.installed && droidStatus?.runnable);
 
   // (#618) Match any custom:OmniRoute-<i> entry (multi-model).
-  const isOmniRouteEntry = (m) => typeof m?.id === "string" && m.id.startsWith("custom:OmniRoute");
+  const isOmniRouteEntry = (m) => typeof m?.id === "string" && m.id.startsWith("custom:API Router");
 
   const getConfigStatus = () => {
     if (!cliReady) return null;
@@ -362,7 +362,7 @@ export default function DroidToolCard({
           {!checkingDroid && cliReady && (
             <>
               <div className="flex flex-col gap-2">
-                {/* Current Base URL — first OmniRoute entry, any index (#618) */}
+                {/* Current Base URL — first API Router entry, any index (#618) */}
                 {droidStatus?.settings?.customModels?.find(isOmniRouteEntry)?.baseUrl && (
                   <div className="flex items-center gap-2">
                     <span className="w-32 shrink-0 text-sm font-semibold text-text-main text-right">

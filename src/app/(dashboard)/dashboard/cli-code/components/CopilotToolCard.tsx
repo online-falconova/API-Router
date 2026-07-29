@@ -142,7 +142,7 @@ export default function CopilotToolCard({
     }));
 
     const config = {
-      name: "OmniRoute",
+      name: "API Router",
       vendor: "azure",
       apiKey: `\${input:chat.lm.secret.omniroute}`,
       models,

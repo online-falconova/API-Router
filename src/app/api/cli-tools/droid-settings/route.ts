@@ -30,7 +30,7 @@ const getDroidDir = () => path.dirname(getDroidSettingsPath());
 // "installed but not configured" instead of a 500 misread as "not installed".
 const readSettings = async () => readJsoncConfig(getDroidSettingsPath());
 
-// Check if settings has OmniRoute customModels.
+// Check if settings has API Router customModels.
 // Multi-model entries are stored as `custom:OmniRoute-0`, `custom:OmniRoute-1`, …
 // (Ported from upstream PR decolua/9router#618.)
 const hasOmniRouteConfig = (settings: any) => {
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
   }
 }
 
-// POST - Update OmniRoute customModels (merge with existing settings)
+// POST - Update API Router customModels (merge with existing settings)
 export async function POST(request: Request) {
   const authError = await requireCliToolsAuth(request);
   if (authError) return authError;
@@ -157,13 +157,13 @@ export async function POST(request: Request) {
       settings.customModels = [];
     }
 
-    // Remove every existing OmniRoute config (multi-model: index 0..N)
+    // Remove every existing API Router config (multi-model: index 0..N)
     settings.customModels = settings.customModels.filter((m) => !isOmniRouteCustomModel(m));
 
     // Normalize baseUrl to ensure /v1 suffix
     const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
 
-    // Build and prepend OmniRoute entries (one per requested model)
+    // Build and prepend API Router entries (one per requested model)
     const newEntries = buildDroidCustomModels(modelList, {
       baseUrl: normalizedBaseUrl,
       apiKey: apiKey || "your_api_key",
@@ -192,7 +192,7 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE - Remove OmniRoute customModels only (keep other settings)
+// DELETE - Remove API Router customModels only (keep other settings)
 export async function DELETE(request: Request) {
   const authError = await requireCliToolsAuth(request);
   if (authError) return authError;
@@ -223,7 +223,7 @@ export async function DELETE(request: Request) {
       throw error;
     }
 
-    // Remove OmniRoute customModels (every index, multi-model)
+    // Remove API Router customModels (every index, multi-model)
     if (settings.customModels) {
       settings.customModels = settings.customModels.filter((m) => !isOmniRouteCustomModel(m));
 
@@ -245,7 +245,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "OmniRoute settings removed successfully",
+      message: "API Router settings removed successfully",
     });
   } catch (error) {
     console.log("Error resetting droid settings:", error);

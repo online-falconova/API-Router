@@ -71,13 +71,13 @@ const readAuthFile = async () => {
   }
 };
 
-// ── Check if a base_url points to OmniRoute ──────────────────────────────
+// ── Check if a base_url points to API Router ──────────────────────────────
 const isOmniRouteUrl = (baseUrl) => {
   if (!baseUrl) return false;
   return baseUrl.includes(":20128") || baseUrl.includes(":3000") || baseUrl.includes("omniroute");
 };
 
-// ── Check if OmniRoute is configured ─────────────────────────────────────
+// ── Check if API Router is configured ─────────────────────────────────────
 const hasOmniRouteConfig = (authFile) => {
   if (!authFile?.providers) return false;
   const provider = authFile.providers[PROVIDER_NAME];
@@ -129,7 +129,7 @@ export async function GET(request: Request) {
   }
 }
 
-// ── POST - Apply OmniRoute as LM Studio provider + switch to local mode ──
+// ── POST - Apply API Router as LM Studio provider + switch to local mode ──
 /**
  * Steps 1-2 of POST: read the existing Letta auth.json, refuse to clobber a real
  * LM Studio configuration unless `overwrite` is set (409 with conflict info), and back
@@ -242,7 +242,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Settings applied. Restart Letta CLI, then use /model to select a OmniRoute model.",
+      message: "Settings applied. Restart Letta CLI, then use /model to select a API Router model.",
       needsRestart: true,
     });
   } catch (error) {
@@ -253,7 +253,7 @@ export async function POST(request: Request) {
   }
 }
 
-// ── DELETE - Remove OmniRoute configuration ──────────────────────────────
+// ── DELETE - Remove API Router configuration ──────────────────────────────
 export async function DELETE(request: Request) {
   const authError = await requireCliToolsAuth(request);
   if (authError) return authError;
@@ -312,8 +312,8 @@ export async function DELETE(request: Request) {
     }
 
     const message = restored
-      ? "OmniRoute config removed. Your original LM Studio provider has been restored. Restart Letta CLI to take effect."
-      : "OmniRoute config removed. Restart Letta CLI to take effect.";
+      ? "API Router config removed. Your original LM Studio provider has been restored. Restart Letta CLI to take effect."
+      : "API Router config removed. Restart Letta CLI to take effect.";
 
     return NextResponse.json({
       success: true,

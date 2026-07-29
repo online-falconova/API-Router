@@ -21,10 +21,10 @@ export const OPEN_CODE_TARGET: MitmTarget = {
   setupTutorial: {
     steps: [
       "Install the OpenCode CLI/IDE",
-      "Install OmniRoute's root certificate",
+      "Install API Router's root certificate",
       "Enable DNS routing for OpenCode",
       "Restart OpenCode",
-      "Done — OpenCode traffic now routes through OmniRoute",
+      "Done — OpenCode traffic now routes through API Router",
     ],
     detection: { command: "which opencode", platform: "all" },
   },

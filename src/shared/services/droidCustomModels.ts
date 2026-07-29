@@ -1,8 +1,8 @@
 /**
- * Build the OmniRoute `customModels` entries for Factory Droid's `settings.json`.
+ * Build the API Router `customModels` entries for Factory Droid's `settings.json`.
  *
  * Ported from upstream PR decolua/9router#618 (author Anurag Saxena) — multi-model
- * support for the Factory Droid CLI tool. Adapted to OmniRoute branding
+ * support for the Factory Droid CLI tool. Adapted to API Router branding
  * (`custom:OmniRoute-<i>`) and extracted as a pure helper so the route-handler
  * logic is unit-testable without touching the filesystem.
  */
@@ -112,7 +112,7 @@ export function buildDroidCustomModels(
   return entries;
 }
 
-/** True when a `customModels` entry was written by OmniRoute (any index). */
+/** True when a `customModels` entry was written by API Router (any index). */
 export function isOmniRouteCustomModel(entry: { id?: unknown } | null | undefined): boolean {
-  return typeof entry?.id === "string" && entry.id.startsWith("custom:OmniRoute");
+  return typeof entry?.id === "string" && entry.id.startsWith("custom:API Router");
 }

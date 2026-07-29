@@ -85,13 +85,13 @@ export function inspectPeerRequest(
   if (trace.includes(instanceId)) {
     return {
       code: "peer_loop_detected",
-      message: "OmniRoute peer routing loop detected",
+      message: "API Router peer routing loop detected",
     };
   }
   if (trace.length >= getMaxPeerHops(env)) {
     return {
       code: "peer_hop_limit_exceeded",
-      message: "OmniRoute peer routing hop limit exceeded",
+      message: "API Router peer routing hop limit exceeded",
     };
   }
   return null;
@@ -110,7 +110,7 @@ export function rejectPeerRequest<T>(
 }
 
 /**
- * Append this instance to the peer trace for an explicitly allowlisted OmniRoute URL.
+ * Append this instance to the peer trace for an explicitly allowlisted API Router URL.
  * Returns true when the header was applied. Other upstream providers are untouched.
  */
 export function applyPeerTraceHeader(

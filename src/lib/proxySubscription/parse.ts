@@ -4,7 +4,7 @@
  * Turns a subscription body (base64-wrapped list, Clash/Clash.Meta YAML,
  * V2Ray/Clash JSON, or a plain list of URIs) into a normalized node model.
  *
- * OmniRoute's request dispatcher (open-sse/utils/proxyDispatcher) only speaks
+ * API Router's request dispatcher (open-sse/utils/proxyDispatcher) only speaks
  * http / https / socks5 (+ edge relay). Subscriptions whose nodes are
  * Shadowsocks / VMess / VLESS / Trojan / TUIC / Hysteria / WireGuard cannot be
  * used directly — they require a local proxy core (sing-box / clash) that

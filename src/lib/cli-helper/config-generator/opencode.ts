@@ -11,7 +11,7 @@ const CONFIG_PATH = path.join(os.homedir(), ".config", "opencode", "opencode.jso
 
 /**
  * SSRF guard for the catalog fetch (CodeQL js/request-forgery #326). The catalog
- * source is the user's OWN OmniRoute instance, so loopback/private hosts are the
+ * source is the user's OWN API Router instance, so loopback/private hosts are the
  * legitimate default and must stay allowed — we cannot use the public-only guard
  * here. What has NO legitimate use as a catalog source is the cloud-metadata /
  * link-local pivot (169.254.169.254, metadata.google.internal, …): that is the
@@ -95,7 +95,7 @@ export interface CatalogFetchResult {
 }
 
 /**
- * Fetch the live `/v1/models` catalog from OmniRoute. The catalog is the
+ * Fetch the live `/v1/models` catalog from API Router. The catalog is the
  * single source of truth for context windows — opencode.json must NOT
  * hardcode values, otherwise we drift from the provider's actual limits.
  */
@@ -128,7 +128,7 @@ export async function fetchOmniRouteCatalog(
     });
     if (!response.ok) {
       throw new Error(
-        `OmniRoute /v1/models returned ${response.status} ${response.statusText}`
+        `API Router /v1/models returned ${response.status} ${response.statusText}`
       );
     }
     const body = (await response.json()) as unknown;
@@ -308,7 +308,7 @@ export interface GenerateOpencodeOptions {
 }
 
 /**
- * Generate a full `opencode.json` document for OmniRoute. The catalog is the
+ * Generate a full `opencode.json` document for API Router. The catalog is the
  * single source of truth for context windows — we never hardcode values.
  *
  * Behavior:
@@ -365,7 +365,7 @@ export async function generateOpencodeConfig(
   }
 
   const provider: Record<string, unknown> = {
-    name: existingProvider?.name ?? "OmniRoute",
+    name: existingProvider?.name ?? "API Router",
     npm: existingProvider?.npm ?? "@ai-sdk/openai-compatible",
     options: {
       baseURL,
