@@ -318,6 +318,13 @@ const ENV_VAR_DENYLIST = new Set([
   "LOCAL_ONLY", // routeGuard classification label (AGENTBRIDGE.md)
   "SPAWN_CAPABLE", // routeGuard classification label (AGENTBRIDGE.md)
   "ZEROGRAVITY_SENSITIVE_WORDS", // cross-project constant named in a comparison (STEALTH_GUIDE.md)
+  // ── Deliberate negative claims: vars the docs state are NOT read by the app ──
+  // Flagging these would invert the gate's intent — the docs are correct precisely
+  // because the name is absent from the codebase.
+  "DATABASE_URL", // documented as never read; PostgreSQL is a DROP (cluster-decisions.md, DOKPLOY_DEPLOYMENT_GUIDE.md)
+  // ── Compose-level interpolation vars (read by docker compose, not process.env) ─
+  "REDIS_PASSWORD", // interpolated into REDIS_URL + the redis --requirepass flag by docker-compose.dokploy.yml
+  "API_ROUTER_IMAGE", // selects the GHCR image tag in docker-compose.dokploy.yml
 ]);
 
 /** Endpoints that don't follow the standard route.ts pattern. */

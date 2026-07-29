@@ -52,11 +52,16 @@
 #      (DISABLE_SQLITE_AUTO_BACKUP=false, on by default — leave it on).
 #
 #  ── Notes ───────────────────────────────────────────────────────────
-#  • Build RAM: the Next.js build asks for ~4 GB. On a small VPS lower
-#    OMNIROUTE_BUILD_MEMORY_MB, or build elsewhere and deploy an image.
-#  • `target: runner-base` is the lean image. Switch to `runner-web` only if
-#    you need the web-cookie providers (gemini-web, claude-web,
-#    claude-turnstile) — it adds Chromium and ~300 MB.
+#  • This file PULLS a prebuilt image instead of building on the VPS. The Next.js
+#    production build needs ~5-6 GB of FREE RAM; on a VPS already running other
+#    workloads the kernel OOM-kills it mid-build with no error message. The image
+#    is built by .github/workflows/build-fork.yml and pulled from GHCR.
+#  • Because the image is prebuilt, OMNIROUTE_BASE_PATH is fixed at CI build time
+#    (Next.js `basePath` is a build-time constant). Setting it in the Dokploy
+#    environment has no effect — change it in the workflow and republish instead.
+#  • The published image targets `runner-base`, the lean variant. If you need the
+#    web-cookie providers (gemini-web, claude-web, claude-turnstile), change
+#    `target:` to `runner-web` in the workflow — it adds Chromium and ~300 MB.
 #  • If you enable Dokploy's "Isolated Deployments", delete the `networks:`
 #    blocks below — Dokploy handles connectivity itself in that mode.
 #  • The live-monitoring WebSocket listens on 20132. It is exposed on the
@@ -67,14 +72,31 @@
 
 services:
   api-router:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner-base
-      args:
-        OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
-        OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
-    image: api-router:dokploy
+    # Prebuilt image pulled from GHCR, published by .github/workflows/build-fork.yml
+    # on every push to main. Building here instead would need ~5-6 GB of FREE RAM for
+    # the Next.js production build (Dockerfile ARG OMNIROUTE_BUILD_MEMORY_MB=4096 plus
+    # V8/Turbopack overhead); a VPS that is already running other workloads gets the
+    # build OOM-killed by the kernel with no error message. CI has the headroom, the
+    # VPS does not, so the compile happens in Actions and the VPS only ever pulls.
+    #
+    # Pin a specific build by overriding this in the Dokploy environment, e.g.
+    #   API_ROUTER_IMAGE=ghcr.io/cloud-falconova/api-router:sha-<commit>
+    # `latest` tracks the tip of main.
+    #
+    # NOTE: GHCR packages are PRIVATE by default. Either mark the package public
+    # (GitHub -> Packages -> api-router -> Package settings -> Change visibility)
+    # or add a GHCR registry credential in Dokploy, otherwise the pull returns 403.
+    #
+    # To build on the VPS after all (needs the RAM above), replace the `image:` line
+    # with:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile
+    #     target: runner-base
+    #     args:
+    #       OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
+    #       OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
+    image: ${API_ROUTER_IMAGE:-ghcr.io/cloud-falconova/api-router:latest}
     restart: unless-stopped
     stop_grace_period: 40s
     depends_on:

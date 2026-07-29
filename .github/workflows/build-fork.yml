@@ -13,12 +13,14 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: ghcr.io/kang-heewon/omniroute
+  # GHCR requires a lowercase image path, so this is not a 1:1 echo of the repo name
+  # (cloud-falconova/API-Router).
+  IMAGE_NAME: ghcr.io/cloud-falconova/api-router
 
 jobs:
   build:
     name: Build and Push Fork Image
-    if: github.repository == 'kang-heewon/OmniRoute'
+    if: github.repository == 'cloud-falconova/API-Router'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,9 +30,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -52,10 +51,10 @@ jobs:
             type=sha,prefix=sha-
             type=ref,event=tag
           labels: |
-            org.opencontainers.image.title=omniroute
-            org.opencontainers.image.description=Unified AI proxy/router — fork image
-            org.opencontainers.image.url=https://github.com/kang-heewon/OmniRoute
-            org.opencontainers.image.source=https://github.com/kang-heewon/OmniRoute
+            org.opencontainers.image.title=api-router
+            org.opencontainers.image.description=Unified AI proxy/router — API Router fork image
+            org.opencontainers.image.url=https://github.com/cloud-falconova/API-Router
+            org.opencontainers.image.source=https://github.com/cloud-falconova/API-Router
             org.opencontainers.image.licenses=MIT
 
       - name: Build and push
@@ -63,7 +62,9 @@ jobs:
         with:
           context: .
           target: runner-base
-          platforms: linux/amd64,linux/arm64
+          # amd64 only: the Dokploy VPS is x86_64, and dropping the emulated arm64
+          # leg (which needs QEMU) roughly halves wall-clock build time.
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
