@@ -44,9 +44,12 @@ export async function generateMetadata() {
       icon: customFaviconUrl
         ? "/api/settings/favicon"
         : [
-            { url: "/favicon.ico", sizes: "any" },
-            { url: "/favicon.svg", type: "image/svg+xml" },
+            // New brand logo (PNG) preferred first so the updated favicon shows
+            // across browsers; legacy .ico/.svg kept as fallbacks.
+            { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
             { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+            { url: "/favicon.svg", type: "image/svg+xml" },
+            { url: "/favicon.ico", sizes: "any" },
           ],
       apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     },

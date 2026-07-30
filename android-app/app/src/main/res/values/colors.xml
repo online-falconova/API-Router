@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_night">#0B1F3A</color>
+    <color name="brand_night_dark">#071528</color>
+    <color name="brand_accent">#F4A300</color>
+    <color name="brand_muted">#9FB2CC</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>

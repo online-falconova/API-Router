@@ -521,8 +521,8 @@ export function LlmChatCard({
         )}
       </div>
 
-      {/* Input row */}
-      <div className="relative flex items-end gap-2 rounded-lg border border-border bg-bg-subtle px-3 py-2 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary/50 transition-colors">
+      {/* Input row — neumorphic recessed bar with a touch-friendly send button */}
+      <div className="relative flex items-end gap-2 rounded-control border border-black/5 dark:border-white/5 bg-bg-subtle neu-inset px-3 py-2 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary/50 transition-colors">
         <textarea
           ref={textareaRef}
           value={input}
@@ -530,16 +530,16 @@ export function LlmChatCard({
           onKeyDown={handleKeyDown}
           rows={1}
           placeholder={`${t("send")}…`}
-          className="flex-1 bg-transparent text-sm py-1.5 text-text-main placeholder:text-text-muted focus:outline-none resize-none max-h-32"
+          className="flex-1 bg-transparent text-[16px] sm:text-sm py-1.5 text-text-main placeholder:text-text-muted focus:outline-none resize-none max-h-32"
         />
         {streaming ? (
           <button
             type="button"
             onClick={handleStop}
             title={t("stop")}
-            className="size-8 flex items-center justify-center rounded-md border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0"
+            className="size-10 flex items-center justify-center rounded-control border border-red-500/30 bg-red-500/10 text-red-400 neu-press active:neu-pressed hover:bg-red-500/20 transition-colors shrink-0"
           >
-            <span className="material-symbols-outlined text-[18px]">stop</span>
+            <span className="material-symbols-outlined text-[20px]">stop</span>
           </button>
         ) : (
           <button
@@ -547,9 +547,9 @@ export function LlmChatCard({
             onClick={() => void handleSend()}
             disabled={!input.trim()}
             title={t("send")}
-            className="size-8 flex items-center justify-center rounded-md bg-primary text-white hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
+            className="size-10 flex items-center justify-center rounded-control bg-primary text-white neu-raised-sm neu-press active:neu-pressed hover:opacity-90 disabled:opacity-40 shrink-0"
           >
-            <span className="material-symbols-outlined text-[18px]">arrow_upward</span>
+            <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
           </button>
         )}
       </div>

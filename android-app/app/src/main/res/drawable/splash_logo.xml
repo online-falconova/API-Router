@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- System (window) splash icon: the brand logo with a small inset so it reads
+     well inside the platform's masked splash icon slot. The richer animated
+     splash is handled by the in-app overlay in activity_main.xml. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/falcon_logo"
+    android:insetLeft="8%"
+    android:insetTop="8%"
+    android:insetRight="8%"
+    android:insetBottom="8%" />

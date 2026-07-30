@@ -36,9 +36,11 @@ export default function Card({
     <div
       className={cn(
         "bg-surface",
-        "border border-border",
-        "rounded-card shadow-sm",
-        hover && "hover:shadow-md hover:border-primary/30 transition-all cursor-pointer",
+        "border border-black/5 dark:border-white/5",
+        // Neumorphic soft elevation replaces the flat shadow-sm.
+        "rounded-card neu-raised",
+        "transition-all",
+        hover && "hover:border-primary/30 hover:-translate-y-0.5 cursor-pointer",
         paddings[padding],
         className
       )}

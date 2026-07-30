@@ -117,10 +117,11 @@ export default function Input({
           }}
           className={cn(
             "w-full py-2 px-3 text-sm text-text-main",
-            "bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-control",
+            // Neumorphic recessed field: subtle surface + inset soft shadow.
+            "bg-bg-subtle border border-black/5 dark:border-white/5 rounded-control neu-inset",
             "placeholder-text-muted/60",
             "focus:ring-1 focus:ring-accent/30 focus:border-accent/50 focus:outline-none",
-            "transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed",
+            "transition-all disabled:opacity-50 disabled:cursor-not-allowed",
             // iOS zoom fix
             "text-[16px] sm:text-sm",
             icon && "pl-10",

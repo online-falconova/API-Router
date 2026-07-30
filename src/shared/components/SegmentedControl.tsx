@@ -37,7 +37,7 @@ export default function SegmentedControl({
       aria-label={ariaLabel}
       className={cn(
         "inline-flex items-center p-1 rounded-lg",
-        "bg-black/5 dark:bg-white/5",
+        "bg-black/5 dark:bg-white/5 neu-inset-sm",
         className
       )}
     >
@@ -54,7 +54,7 @@ export default function SegmentedControl({
             value === option.value
               ? "bg-white dark:bg-white/10 text-text-main shadow-sm"
               : "text-text-muted hover:text-text-main",
-            option.icon && "flex items-center",
+            option.icon && "flex items-center"
           )}
         >
           {option.icon && (

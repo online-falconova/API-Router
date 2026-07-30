@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme (light). -->
+    <style name="Theme.Falconova" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_night</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/brand_accent</item>
+        <item name="android:statusBarColor">@color/brand_night</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Splash screen theme (uses the AndroidX SplashScreen compat API). -->
+    <style name="Theme.Falconova.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/brand_night</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.Falconova</item>
+    </style>
+</resources>

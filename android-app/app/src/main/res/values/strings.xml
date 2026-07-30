@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">API_Router</string>
+    <string name="splash_tagline">Connecting your providers…</string>
+    <string name="download_started">Download started</string>
+    <string name="download_failed">Download failed</string>
+    <string name="no_app_to_open">No app available to open this link</string>
+</resources>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const subscribePlatform = () => () => {};
@@ -11,6 +11,7 @@ const getPlatformIsMac = () => {
 };
 const getPlatformIsMacServer = () => false;
 import ThemeToggle from "./ThemeToggle";
+import { ConfirmModal } from "./Modal";
 import TokenHealthBadge from "./TokenHealthBadge";
 import DegradationBadge from "./DegradationBadge";
 import LanguageSelector from "./LanguageSelector";
@@ -189,13 +190,17 @@ export default function Header({
   const router = useRouter();
   const isElectron = useIsElectron();
   const t = useTranslations("header");
+  const tCommon = useTranslations("common");
   const { title, description, icon, providerId } = usePageInfo(pathname);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const isMacElectron =
     isElectron &&
     typeof window !== "undefined" &&
     (window as any).electronAPI?.platform === "darwin";
 
   const handleLogout = async () => {
+    setLoggingOut(true);
     try {
       const res = await fetch("/api/auth/logout", { method: "POST" });
       if (res.ok) {
@@ -204,87 +209,109 @@ export default function Header({
       }
     } catch (err) {
       console.error("Failed to logout:", err);
+    } finally {
+      setLoggingOut(false);
+      setShowLogoutConfirm(false);
     }
   };
 
   return (
-    <header
-      className="sticky top-0 z-10 flex items-center justify-between border-b border-black/5 bg-bg px-8 py-4 dark:border-white/5"
-      style={{
-        paddingTop: isMacElectron ? "calc(1rem + var(--desktop-safe-top))" : undefined,
-      }}
-    >
-      {/* Mobile menu button */}
-      <div className="flex items-center gap-3 lg:hidden">
-        {showMenuButton && (
+    <>
+      <header
+        className="sticky top-0 z-10 flex items-center justify-between border-b border-black/5 bg-bg px-8 py-4 dark:border-white/5"
+        style={{
+          // Respect the device safe-area (status bar / notch) in browser & PWA
+          // standalone mode. env() resolves to 0 in normal browsers and inside the
+          // Android WebView (insets already consumed natively), so it never double-pads.
+          paddingTop: isMacElectron
+            ? "calc(1rem + var(--desktop-safe-top))"
+            : "calc(1rem + env(safe-area-inset-top))",
+        }}
+      >
+        {/* Mobile menu button */}
+        <div className="flex items-center gap-3 lg:hidden">
+          {showMenuButton && (
+            <button
+              onClick={onMenuClick}
+              className="text-text-main hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          )}
+        </div>
+
+        {/* Page title with icon - desktop */}
+        <div className="hidden lg:flex items-center gap-3">
+          {(icon || providerId) && (
+            <div className="flex items-center justify-center size-9 rounded-lg bg-primary/10 shrink-0">
+              {icon ? (
+                <span className="material-symbols-outlined text-primary text-[20px]">{icon}</span>
+              ) : (
+                providerId && <ProviderIcon providerId={providerId} size={22} type="color" />
+              )}
+            </div>
+          )}
+          {title && (
+            <div>
+              <h1 className="text-xl font-semibold text-text-main tracking-tight">{title}</h1>
+              {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
+            </div>
+          )}
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-3 ml-auto">
+          {onOpenCommandPalette && (
+            <>
+              <button
+                type="button"
+                onClick={onOpenCommandPalette}
+                className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-black/10 dark:border-white/10 bg-bg-subtle text-text-muted hover:text-text-main hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors"
+                title={t("quickNavigationTitle")}
+                aria-label={t("openQuickNavigation")}
+              >
+                <span className="material-symbols-outlined text-[16px]">search</span>
+                <span className="text-xs">{t("quickNavigation")}</span>
+                <kbd className="hidden lg:inline-flex font-mono text-[10px] px-1 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                  {isMac ? "⌘K" : "Ctrl+K"}
+                </kbd>
+              </button>
+              <button
+                type="button"
+                onClick={onOpenCommandPalette}
+                className="md:hidden p-2 rounded-lg text-text-muted hover:text-text-main hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                aria-label={t("openQuickNavigation")}
+              >
+                <span className="material-symbols-outlined">search</span>
+              </button>
+            </>
+          )}
+          <LanguageSelector />
+          <ThemeToggle />
+          {!isE2EMode && <DegradationBadge />}
+          {!isE2EMode && <TokenHealthBadge />}
           <button
-            onClick={onMenuClick}
-            className="text-text-main hover:text-primary transition-colors"
+            onClick={() => setShowLogoutConfirm(true)}
+            className="flex items-center justify-center p-2 rounded-lg text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-all"
+            title={t("logout")}
+            aria-label={t("logout")}
           >
-            <span className="material-symbols-outlined">menu</span>
+            <span className="material-symbols-outlined">logout</span>
           </button>
-        )}
-      </div>
+        </div>
+      </header>
 
-      {/* Page title with icon - desktop */}
-      <div className="hidden lg:flex items-center gap-3">
-        {(icon || providerId) && (
-          <div className="flex items-center justify-center size-9 rounded-lg bg-primary/10 shrink-0">
-            {icon ? (
-              <span className="material-symbols-outlined text-primary text-[20px]">{icon}</span>
-            ) : (
-              providerId && <ProviderIcon providerId={providerId} size={22} type="color" />
-            )}
-          </div>
-        )}
-        {title && (
-          <div>
-            <h1 className="text-xl font-semibold text-text-main tracking-tight">{title}</h1>
-            {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
-          </div>
-        )}
-      </div>
-
-      {/* Right actions */}
-      <div className="flex items-center gap-3 ml-auto">
-        {onOpenCommandPalette && (
-          <>
-            <button
-              type="button"
-              onClick={onOpenCommandPalette}
-              className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-black/10 dark:border-white/10 bg-bg-subtle text-text-muted hover:text-text-main hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors"
-              title={t("quickNavigationTitle")}
-              aria-label={t("openQuickNavigation")}
-            >
-              <span className="material-symbols-outlined text-[16px]">search</span>
-              <span className="text-xs">{t("quickNavigation")}</span>
-              <kbd className="hidden lg:inline-flex font-mono text-[10px] px-1 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                {isMac ? "⌘K" : "Ctrl+K"}
-              </kbd>
-            </button>
-            <button
-              type="button"
-              onClick={onOpenCommandPalette}
-              className="md:hidden p-2 rounded-lg text-text-muted hover:text-text-main hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              aria-label={t("openQuickNavigation")}
-            >
-              <span className="material-symbols-outlined">search</span>
-            </button>
-          </>
-        )}
-        <LanguageSelector />
-        <ThemeToggle />
-        {!isE2EMode && <DegradationBadge />}
-        {!isE2EMode && <TokenHealthBadge />}
-        <button
-          onClick={handleLogout}
-          className="flex items-center justify-center p-2 rounded-lg text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-all"
-          title={t("logout")}
-          aria-label={t("logout")}
-        >
-          <span className="material-symbols-outlined">logout</span>
-        </button>
-      </div>
-    </header>
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        variant="danger"
+        title={t("logout")}
+        message={tCommon("confirm")}
+        confirmText={t("logout")}
+        cancelText={tCommon("cancel")}
+        loading={loggingOut}
+      />
+    </>
   );
 }

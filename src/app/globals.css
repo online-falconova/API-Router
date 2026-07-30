@@ -102,6 +102,18 @@
   --radius-control: 9px;
   --grad-brand: linear-gradient(135deg, var(--color-primary), var(--color-accent-light));
 
+  /* ── Neumorphism (soft UI) shadow system ──────────────────────────────
+     Dual light/dark shadows give the "extruded from the surface" look.
+     These reference --neu-light / --neu-dark, which are overridden in .dark;
+     CSS custom properties resolve lazily at use-site, so the composed shadows
+     automatically flip for dark mode without redefining them. */
+  --neu-light: rgba(255, 255, 255, 0.9);
+  --neu-dark: rgba(17, 22, 34, 0.12);
+  --neu-raised: 5px 5px 12px var(--neu-dark), -5px -5px 12px var(--neu-light);
+  --neu-raised-sm: 3px 3px 7px var(--neu-dark), -3px -3px 7px var(--neu-light);
+  --neu-inset: inset 2px 2px 5px var(--neu-dark), inset -2px -2px 5px var(--neu-light);
+  --neu-pressed: inset 4px 4px 9px var(--neu-dark), inset -4px -4px 9px var(--neu-light);
+
   /* Data-table surfaces — theme-aware. The DARK values (in .dark below) exactly mirror
      the previous hardcoded rgba in DataTable.tsx so dark stays byte-identical; these
      light values are the fix (the old code was always-dark via dead var fallbacks). */
@@ -155,6 +167,11 @@
   --grid-line: rgba(255, 255, 255, 0.06);
   --section-alt: rgba(255, 255, 255, 0.018);
   --surface-2: #1c2230;
+
+  /* Neumorphism — dark-mode light/shadow sources. Only these two flip; the
+     composed --neu-* shadows above pick them up automatically. */
+  --neu-light: rgba(255, 255, 255, 0.035);
+  --neu-dark: rgba(0, 0, 0, 0.55);
 
   /* Data-table surfaces — dark = the exact old hardcoded values (byte-identical). */
   --table-header-bg: rgba(15, 15, 25, 0.95);
@@ -222,6 +239,46 @@
      9px). Custom names so the default rounded-sm/md/lg/xl utilities stay untouched. */
   --radius-card: var(--radius);
   --radius-control: var(--radius-control);
+}
+
+/* ── Neumorphism utilities ──────────────────────────────────────────────
+   Registered as Tailwind v4 @utility so they live in the utilities layer:
+   they compose with variants (hover:/active:/dark:) and are always overridden
+   by the unlayered :focus-visible ring below, so focus states stay visible. */
+@utility neu-raised {
+  box-shadow: var(--neu-raised);
+}
+
+@utility neu-raised-sm {
+  box-shadow: var(--neu-raised-sm);
+}
+
+@utility neu-inset {
+  box-shadow: var(--neu-inset);
+}
+
+@utility neu-pressed {
+  box-shadow: var(--neu-pressed);
+}
+
+/* Tactile press motion for pressable neumorphic controls (buttons, send). */
+@utility neu-press {
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.12s ease,
+    filter 0.18s ease;
+}
+
+/* Honor reduced-motion: strip the tactile transform/animation for users who
+   opt out, keeping only instant state changes. */
+@media (prefers-reduced-motion: reduce) {
+  .neu-press {
+    transition: none;
+  }
+
+  .neu-press:active {
+    transform: none;
+  }
 }
 
 /* ── Focus Indicators (U-3) ── */
@@ -385,6 +442,7 @@ button .material-symbols-outlined,
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -399,6 +457,7 @@ button .material-symbols-outlined,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -416,6 +475,7 @@ button .material-symbols-outlined,
       0 0 10px rgba(220, 38, 38, 0.2);
     border-color: rgba(220, 38, 38, 0.5);
   }
+
   50% {
     box-shadow:
       0 0 10px rgba(220, 38, 38, 0.5),
@@ -472,7 +532,8 @@ button .material-symbols-outlined,
   }
 
   .ant-table {
-    min-width: 600px; /* Prevent columns from crushing together */
+    min-width: 600px;
+    /* Prevent columns from crushing together */
   }
 }
 
@@ -499,8 +560,119 @@ select option {
   display: none;
   min-height: 0;
 }
+
 @media (min-width: 1024px) {
   .dashboard-sidebar-desktop {
     display: flex;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Neumorphism design layer
+   Soft-UI tokens + utilities shared by the primitives (Button/Input/Textarea/
+   Select/Card) and the chat surfaces. Dual shadows (a light highlight + a dark
+   drop) give the raised/inset "soft" feel. Values are theme-aware: on light we
+   use a bright highlight + soft dark drop; on dark we invert. Everything is
+   token-driven so a single change re-tunes the whole app, and utilities degrade
+   gracefully on any surface colour.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --neu-shadow-dark: rgba(17, 24, 39, 0.16);
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-distance: 5px;
+  --neu-blur: 12px;
+
+  --neu-raised:
+    var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--neu-shadow-dark),
+    calc(-1 * var(--neu-distance)) calc(-1 * var(--neu-distance)) var(--neu-blur)
+      var(--neu-shadow-light);
+  --neu-raised-sm: 3px 3px 7px var(--neu-shadow-dark), -3px -3px 7px var(--neu-shadow-light);
+  --neu-inset:
+    inset 4px 4px 9px var(--neu-shadow-dark), inset -4px -4px 9px var(--neu-shadow-light);
+  --neu-inset-sm:
+    inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+  --neu-focus:
+    0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent), var(--neu-inset-sm);
+}
+
+.dark {
+  --neu-shadow-dark: rgba(0, 0, 0, 0.55);
+  --neu-shadow-light: rgba(255, 255, 255, 0.045);
+}
+
+/* Defined as Tailwind v4 @utility so variants (active:, hover:) resolve and so
+   all soft-shadow utilities share the utilities layer — letting the pressed
+   state (higher specificity via :active) correctly override the raised state. */
+
+/* Raised soft surface (buttons, cards, floating controls) */
+@utility neu-raised {
+  box-shadow: var(--neu-raised);
+}
+
+@utility neu-raised-sm {
+  box-shadow: var(--neu-raised-sm);
+}
+
+/* Inset soft well (inputs, text areas, chat composer) */
+@utility neu-inset {
+  box-shadow: var(--neu-inset);
+}
+
+@utility neu-inset-sm {
+  box-shadow: var(--neu-inset-sm);
+}
+
+/* Press interaction: `neu-press` carries the transition, `active:neu-pressed`
+   sinks the control on tap for a tactile soft-UI feel. */
+@utility neu-press {
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+@utility neu-pressed {
+  box-shadow: var(--neu-inset-sm);
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neu-press {
+    transition: none;
+  }
+}
+
+/* ── App-wide neumorphism reach (all pages, no per-file edits) ──────────────
+   1. Re-point the semantic elevation tokens at the soft-UI shadows so every
+      component using shadow-soft / shadow-elevated / shadow-warm converts.
+   2. Override the built-in shadow-sm / shadow-md utilities (unlayered so they
+      beat Tailwind's layered utilities) — these mark the card/panel surfaces
+      used across ~40 places, so page-level cards pick up the soft look.
+   3. Give bare (un-utility-styled) form controls a neumorphic recessed base in
+      the base layer, which any component utility class still overrides. */
+:root,
+.dark {
+  --shadow-soft: var(--neu-raised-sm);
+  --shadow-elevated: var(--neu-raised);
+  --shadow-warm: var(--neu-raised);
+}
+
+.shadow-sm {
+  box-shadow: var(--neu-raised-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--neu-raised);
+}
+
+@layer base {
+  input:where(
+    :not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not(
+        [type="file"]
+      ):not([type="submit"]):not([type="button"]):not([type="image"])
+  ),
+  textarea,
+  select {
+    border-radius: var(--radius-control);
+    box-shadow: var(--neu-inset-sm);
   }
 }
