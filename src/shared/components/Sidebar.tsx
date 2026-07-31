@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, type CSSProperties } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/shared/utils/cn";
@@ -381,8 +382,8 @@ export default function Sidebar({
   const renderNavLink = (item) => {
     const active = !item.external && activeHref === item.href;
     const className = cn(
-      "flex items-center gap-3 rounded-lg transition-all group",
-      collapsed ? "justify-center px-2 py-2.5" : "px-3 py-1.5",
+      "flex min-h-11 items-center gap-3 rounded-lg transition-all group",
+      collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
       active
         ? "bg-primary/10 text-primary"
         : "text-text-muted hover:bg-surface/50 hover:text-text-main"
@@ -482,7 +483,7 @@ export default function Sidebar({
                 aria-expanded={!collapsed}
                 aria-label={collapsed ? t("expandSidebar") : t("collapseSidebar")}
                 className={cn(
-                  "rounded-md p-1 text-text-muted/50 transition-colors hover:bg-black/5 hover:text-text-muted dark:hover:bg-white/5",
+                  "flex min-h-11 min-w-11 items-center justify-center rounded-md text-text-muted/50 transition-colors hover:bg-black/5 hover:text-text-muted dark:hover:bg-white/5",
                   collapsed && !isMacElectron && "mt-2",
                   isMacElectron && "ms-auto"
                 )}
@@ -503,9 +504,12 @@ export default function Sidebar({
           >
             <div className="flex items-center justify-center size-10 shrink-0">
               {customLogo ? (
-                <img
+                <Image
                   src={customLogo}
                   alt={customAppName || APP_CONFIG.name}
+                  width={40}
+                  height={40}
+                  unoptimized
                   className="size-10 object-contain"
                 />
               ) : (
@@ -581,49 +585,49 @@ export default function Sidebar({
             // Expanded mode: collapsible section with pin
             return (
               <div key={section.id} className={isFirst ? "space-y-0.5" : "mt-2"}>
-                <div
-                  className="flex items-center gap-0.5 px-2 py-1 rounded-md hover:bg-surface/30 transition-colors cursor-pointer group/header"
-                  onClick={() => toggleSection(sectionId)}
-                  role="button"
-                  aria-expanded={isExpanded}
-                >
-                  <span className="flex-1 text-[10px] font-semibold text-text-muted/60 uppercase tracking-wider group-hover/header:text-text-muted/90 transition-colors">
-                    {section.title}
-                  </span>
-
-                  {/* Pin button — right side near chevron */}
+                <div className="group/header flex min-h-11 items-center gap-0.5 rounded-md px-1 transition-colors hover:bg-surface/30">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePin(sectionId);
-                    }}
+                    type="button"
+                    onClick={() => toggleSection(sectionId)}
+                    aria-expanded={isExpanded}
+                    className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-1 rounded px-1 text-start"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[10px] font-semibold uppercase tracking-wider text-text-muted/60 transition-colors group-hover/header:text-text-muted/90">
+                      {section.title}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "material-symbols-outlined shrink-0 text-[14px] text-text-muted/40 transition-all duration-200 group-hover/header:text-text-muted/70",
+                        isExpanded && "rotate-180"
+                      )}
+                    >
+                      expand_more
+                    </span>
+                  </button>
+
+                  {/* Pin remains visible on touch layouts and appears on hover/focus on desktop. */}
+                  <button
+                    type="button"
+                    onClick={() => togglePin(sectionId)}
+                    aria-label={isPinned ? t("unpinSection") : t("pinSectionOpen")}
+                    aria-pressed={isPinned}
                     title={isPinned ? t("unpinSection") : t("pinSectionOpen")}
                     className={cn(
-                      "p-0.5 rounded transition-all shrink-0",
+                      "flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded transition-all focus-visible:opacity-100",
                       isPinned
                         ? "text-primary opacity-100"
-                        : "text-text-muted/30 opacity-0 group-hover/header:opacity-100 hover:text-text-muted/70"
+                        : "text-text-muted/50 opacity-100 hover:text-text-muted/80 lg:opacity-0 lg:group-hover/header:opacity-100"
                     )}
                   >
                     <span
-                      className="material-symbols-outlined"
-                      style={{
-                        fontSize: "10px",
-                        ...(isPinned ? { fontVariationSettings: "'FILL' 1" } : {}),
-                      }}
+                      aria-hidden="true"
+                      className="material-symbols-outlined text-[14px]"
+                      style={isPinned ? { fontVariationSettings: "'FILL' 1" } : undefined}
                     >
                       push_pin
                     </span>
                   </button>
-
-                  <span
-                    className={cn(
-                      "material-symbols-outlined text-[14px] text-text-muted/40 transition-all duration-200 group-hover/header:text-text-muted/70 shrink-0",
-                      isExpanded && "rotate-180"
-                    )}
-                  >
-                    expand_more
-                  </span>
                 </div>
 
                 {isExpanded && (
@@ -670,7 +674,7 @@ export default function Sidebar({
             onClick={() => setShowRestartModal(true)}
             title={t("restart")}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-lg font-medium transition-all",
+              "flex min-h-11 items-center justify-center gap-2 rounded-lg font-medium transition-all",
               "text-amber-500 hover:bg-amber-500/10 border border-amber-500/20 hover:border-amber-500/40",
               collapsed ? "p-2" : "flex-1 min-w-0 px-2 py-1.5 text-xs"
             )}
@@ -682,7 +686,7 @@ export default function Sidebar({
             onClick={() => setShowShutdownModal(true)}
             title={t("shutdown")}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-lg font-medium transition-all",
+              "flex min-h-11 items-center justify-center gap-2 rounded-lg font-medium transition-all",
               "text-red-500 hover:bg-red-500/10 border border-red-500/20 hover:border-red-500/40",
               collapsed ? "p-2" : "flex-1 min-w-0 px-2 py-1.5 text-xs"
             )}

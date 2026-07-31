@@ -101,7 +101,7 @@ export default function CodexConnectClient({ token }: { token: string }) {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-base px-4 py-10">
+    <div className="min-h-dvh flex items-center justify-center bg-bg-base px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border bg-bg-subtle p-8 shadow-sm">
         <div className="mb-6 text-center">
           <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">

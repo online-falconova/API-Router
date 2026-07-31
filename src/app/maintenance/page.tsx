@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function MaintenancePage() {
   return (
-    <main className="min-h-screen text-text-main flex items-center justify-center p-6">
-      <section className="w-full max-w-xl rounded-2xl border border-border bg-surface p-8 shadow-soft text-center">
+    <main className="min-h-dvh text-text-main flex items-center justify-center p-4 sm:p-6">
+      <section className="w-full max-w-xl rounded-2xl border border-border bg-surface p-5 shadow-soft text-center sm:p-8">
         <span className="material-symbols-outlined text-5xl text-primary mb-3" aria-hidden="true">
           construction
         </span>

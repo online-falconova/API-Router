@@ -3634,7 +3634,7 @@ function ComboFormModal({ isOpen, combo, onClose, onSave, activeProviders, combo
 
               {advancedConfigVisible && (
                 <div className="flex flex-col gap-2 p-3 bg-black/[0.02] dark:bg-white/[0.02] rounded-lg border border-black/5 dark:border-white/5">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div>
                       <FieldLabelWithHelp
                         label={t("maxRetries")}

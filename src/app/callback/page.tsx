@@ -16,9 +16,7 @@ import { useEffect, useState } from "react";
  */
 export default function CallbackPage() {
   const [status, setStatus] = useState<"processing" | "success" | "done" | "manual">("processing");
-  const [currentUrl] = useState(() =>
-    typeof window === "undefined" ? "" : window.location.href
-  );
+  const [currentUrl] = useState(() => (typeof window === "undefined" ? "" : window.location.href));
   const t = useTranslations("auth");
 
   useEffect(() => {
@@ -69,10 +67,7 @@ export default function CallbackPage() {
     if (window.opener) {
       for (const origin of trustedTargetOrigins) {
         try {
-          window.opener.postMessage(
-            { type: "oauth_callback", data: callbackData },
-            origin
-          );
+          window.opener.postMessage({ type: "oauth_callback", data: callbackData }, origin);
           sent = true;
         } catch (e) {
           console.log("postMessage failed:", e);
@@ -124,7 +119,7 @@ export default function CallbackPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-dvh flex items-center justify-center">
       <div className="text-center p-8 max-w-md">
         {status === "processing" && (
           <>

@@ -102,17 +102,8 @@
   --radius-control: 9px;
   --grad-brand: linear-gradient(135deg, var(--color-primary), var(--color-accent-light));
 
-  /* ── Neumorphism (soft UI) shadow system ──────────────────────────────
-     Dual light/dark shadows give the "extruded from the surface" look.
-     These reference --neu-light / --neu-dark, which are overridden in .dark;
-     CSS custom properties resolve lazily at use-site, so the composed shadows
-     automatically flip for dark mode without redefining them. */
-  --neu-light: rgba(255, 255, 255, 0.9);
-  --neu-dark: rgba(17, 22, 34, 0.12);
-  --neu-raised: 5px 5px 12px var(--neu-dark), -5px -5px 12px var(--neu-light);
-  --neu-raised-sm: 3px 3px 7px var(--neu-dark), -3px -3px 7px var(--neu-light);
-  --neu-inset: inset 2px 2px 5px var(--neu-dark), inset -2px -2px 5px var(--neu-light);
-  --neu-pressed: inset 4px 4px 9px var(--neu-dark), inset -4px -4px 9px var(--neu-light);
+  /* Neumorphism (soft UI) shadow tokens live in the "Neumorphism design layer"
+     block lower in this file — single source of truth for --neu-* + utilities. */
 
   /* Data-table surfaces — theme-aware. The DARK values (in .dark below) exactly mirror
      the previous hardcoded rgba in DataTable.tsx so dark stays byte-identical; these
@@ -168,10 +159,8 @@
   --section-alt: rgba(255, 255, 255, 0.018);
   --surface-2: #1c2230;
 
-  /* Neumorphism — dark-mode light/shadow sources. Only these two flip; the
-     composed --neu-* shadows above pick them up automatically. */
-  --neu-light: rgba(255, 255, 255, 0.035);
-  --neu-dark: rgba(0, 0, 0, 0.55);
+  /* Neumorphism dark-mode shadow sources flip in the "Neumorphism design layer"
+     block lower in this file (--neu-shadow-dark / --neu-shadow-light). */
 
   /* Data-table surfaces — dark = the exact old hardcoded values (byte-identical). */
   --table-header-bg: rgba(15, 15, 25, 0.95);
@@ -241,45 +230,8 @@
   --radius-control: var(--radius-control);
 }
 
-/* ── Neumorphism utilities ──────────────────────────────────────────────
-   Registered as Tailwind v4 @utility so they live in the utilities layer:
-   they compose with variants (hover:/active:/dark:) and are always overridden
-   by the unlayered :focus-visible ring below, so focus states stay visible. */
-@utility neu-raised {
-  box-shadow: var(--neu-raised);
-}
-
-@utility neu-raised-sm {
-  box-shadow: var(--neu-raised-sm);
-}
-
-@utility neu-inset {
-  box-shadow: var(--neu-inset);
-}
-
-@utility neu-pressed {
-  box-shadow: var(--neu-pressed);
-}
-
-/* Tactile press motion for pressable neumorphic controls (buttons, send). */
-@utility neu-press {
-  transition:
-    box-shadow 0.18s ease,
-    transform 0.12s ease,
-    filter 0.18s ease;
-}
-
-/* Honor reduced-motion: strip the tactile transform/animation for users who
-   opt out, keeping only instant state changes. */
-@media (prefers-reduced-motion: reduce) {
-  .neu-press {
-    transition: none;
-  }
-
-  .neu-press:active {
-    transform: none;
-  }
-}
+/* Neumorphism @utility classes (neu-raised / neu-inset / neu-press / neu-pressed
+   …) are defined once in the "Neumorphism design layer" block lower in this file. */
 
 /* ── Focus Indicators (U-3) ── */
 :root {
@@ -674,5 +626,51 @@ select option {
   select {
     border-radius: var(--radius-control);
     box-shadow: var(--neu-inset-sm);
+  }
+}
+
+/* ── State-view motion (StateView / NetworkStatusBanner) ────────────────────
+   Purpose-driven micro-motion for empty/success/slow icons. All gated by
+   prefers-reduced-motion. Entrance animations use tailwindcss-animate utilities
+   (animate-in fade-in zoom-in) at the call site. */
+@keyframes state-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.state-float {
+  animation: state-float 2.4s ease-in-out infinite;
+}
+
+@keyframes state-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.state-pop {
+  animation: state-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-float,
+  .state-pop {
+    animation: none;
   }
 }

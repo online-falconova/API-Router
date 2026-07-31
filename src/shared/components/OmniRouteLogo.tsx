@@ -1,9 +1,10 @@
 /**
  * API Router brand logo.
  *
- * Renders the shipped brand image at `public/brand-logo.png`. The `size` prop
- * sets a square box and the image is `object-contain`, so the logo keeps its
- * aspect ratio at any call site (sidebar, landing nav/footer, login).
+ * Renders the canonical brand artwork at `public/logo.png` (the operator-
+ * provided logo). The `size` prop sets a square box and the image is
+ * `object-contain`, so the logo keeps its aspect ratio at any call site
+ * (sidebar, landing nav/footer, login).
  *
  * The `className` is preserved for layout tweaks. Any color utility (e.g.
  * `text-white`) is a no-op on a raster image and is simply ignored.
@@ -17,7 +18,7 @@ export default function OmniRouteLogo({ size = 20, className = "" }: OmniRouteLo
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/brand-logo.png"
+      src="/logo.png"
       width={size}
       height={size}
       alt="API Router"

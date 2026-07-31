@@ -430,11 +430,6 @@
       "count": 6
     }
   },
-  "src/shared/components/Sidebar.tsx": {
-    "@next/next/no-img-element": {
-      "count": 1
-    }
-  },
   "src/shared/contracts/quota.ts": {
     "no-restricted-syntax": {
       "count": 1
@@ -453,11 +448,6 @@
   "tests/e2e/ecosystem.test.ts": {
     "@typescript-eslint/no-explicit-any": {
       "count": 17
-    }
-  },
-  "tests/e2e/helpers/dashboardAuth.ts": {
-    "@typescript-eslint/no-explicit-any": {
-      "count": 2
     }
   },
   "tests/e2e/protocol-clients.test.ts": {

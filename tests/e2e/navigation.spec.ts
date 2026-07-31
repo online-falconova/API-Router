@@ -14,6 +14,32 @@ test.describe("Dashboard Navigation", () => {
   test("does not prefetch dashboard routes and preserves client navigation", async ({ page }) => {
     const speculativeRequests: string[] = [];
 
+    // Keep the Home page out of its data-loading skeleton; this test exercises
+    // navigation rather than provider/model/version API integration.
+    await page.route(/\/api\/(providers|models|system\/version)(?:\?.*)?$/, async (route) => {
+      const pathname = new URL(route.request().url()).pathname;
+      const body = pathname === "/api/providers" ? { connections: [] } : { models: [] };
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(body),
+      });
+    });
+
+    // Keep the Quick Start prerequisite deterministic; this preference is user-persisted
+    // and may be disabled in a developer's local database.
+    await page.route("**/api/settings", async (route) => {
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ showQuickStartOnHome: true }),
+      });
+    });
+
     page.on("request", (request) => {
       const headers = request.headers();
       const isRscPrefetch =
@@ -26,13 +52,13 @@ test.describe("Dashboard Navigation", () => {
     });
 
     await gotoDashboardRoute(page, "/home");
-    await expect(page.getByRole("link", { name: /providers/i }).first()).toBeVisible();
+    const providersLink = page.getByRole("link", { name: "Providers", exact: true });
+    await expect(providersLink).toBeVisible();
     await page.waitForTimeout(500);
 
     expect(speculativeRequests).toEqual([]);
 
-    await page.getByRole("link", { name: /providers/i }).first().click();
-    await expect(page).toHaveURL(/\/dashboard\/providers/);
+    await Promise.all([page.waitForURL(/\/dashboard\/providers/), providersLink.click()]);
   });
 
   test("login page renders with form elements", async ({ page }) => {

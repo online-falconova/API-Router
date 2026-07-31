@@ -7,7 +7,7 @@ type ProviderConnection = {
   id: string;
   provider: string;
   name: string;
-  authType: "api_key";
+  authType: "api_key" | "oauth";
   isActive: boolean;
   testStatus: string;
   priority: number;
@@ -18,13 +18,18 @@ type ProviderConnection = {
   lastErrorSource: string | null;
   errorCode: string | null;
   rateLimitedUntil: string | null;
+  rateLimitProtection?: boolean;
+  quotaVisible?: boolean;
+  proxyEnabled?: boolean;
+  perKeyProxyEnabled?: boolean;
+  maxConcurrent?: number | null;
 };
 
-async function installProviderFetchMock(page: Page) {
-  await page.addInitScript(() => {
+async function installProviderFetchMock(page: Page, initialConnections: ProviderConnection[] = []) {
+  await page.addInitScript((seedConnections: ProviderConnection[]) => {
     const state = {
-      connections: [] as ProviderConnection[],
-      nextId: 1,
+      connections: JSON.parse(JSON.stringify(seedConnections)) as ProviderConnection[],
+      nextId: seedConnections.length + 1,
       retestCalls: 0,
       deleteCalls: 0,
       validationCalls: 0,
@@ -215,7 +220,7 @@ async function installProviderFetchMock(page: Page) {
 
       return originalFetch(input, init);
     };
-  });
+  }, initialConnections);
 }
 
 async function readProviderMockState(page: Page) {
@@ -272,7 +277,9 @@ test.describe("Providers management", () => {
     // and shows a Close button. Dismiss it before interacting with the connection list.
     const importDialog = page.getByRole("dialog");
     // The Modal renders two "Close" elements (header X + footer button) — use .first()
-    await expect(importDialog.getByRole("button", { name: "Close" }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(importDialog.getByRole("button", { name: "Close" }).first()).toBeVisible({
+      timeout: 15_000,
+    });
     await importDialog.getByRole("button", { name: "Close" }).first().click();
     await expect(importDialog).not.toBeVisible();
 
@@ -320,5 +327,108 @@ test.describe("Providers management", () => {
     await expect.poll(async () => (await readProviderMockState(page)).deleteCalls).toBe(1);
     await expect(page.getByText("Primary OpenAI Edited")).toHaveCount(0);
     await expect(page.getByText(/no connections yet/i)).toBeVisible();
+  });
+
+  test("keeps a data-heavy provider account row usable at mobile and desktop widths", async ({
+    page,
+  }, testInfo) => {
+    const connection: ProviderConnection = {
+      id: "conn-openai-mobile-layout",
+      provider: "openai",
+      name: "Primary mobile regression account with a long display name",
+      authType: "oauth",
+      isActive: true,
+      testStatus: "active",
+      priority: 12,
+      providerSpecificData: {},
+      lastError: null,
+      lastErrorAt: null,
+      lastErrorType: null,
+      lastErrorSource: null,
+      errorCode: null,
+      rateLimitedUntil: null,
+      rateLimitProtection: true,
+      quotaVisible: true,
+      proxyEnabled: false,
+      perKeyProxyEnabled: false,
+      maxConcurrent: 8,
+    };
+
+    await page.setViewportSize({ width: 320, height: 900 });
+    await installProviderFetchMock(page, [connection]);
+    await gotoDashboardRoute(page, "/dashboard/providers/openai", {
+      timeoutMs: NAVIGATION_TIMEOUT_MS,
+    });
+
+    const row = page.getByTestId("connection-row");
+    const toolbar = page.getByTestId("connections-list-toolbar");
+    const settings = page.getByTestId("connection-settings");
+    const actions = page.getByTestId("connection-actions");
+    await expect(row).toBeVisible();
+
+    for (const width of [320, 360, 390, 430, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: width < 768 ? 900 : 1000 });
+
+      const layout = await page.evaluate(() => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const measure = (selector: string) => {
+          const element = document.querySelector<HTMLElement>(selector);
+          if (!element) return null;
+          const rect = element.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            clientWidth: element.clientWidth,
+            scrollWidth: element.scrollWidth,
+          };
+        };
+        return {
+          viewportWidth,
+          documentScrollWidth: document.documentElement.scrollWidth,
+          row: measure('[data-testid="connection-row"]'),
+          toolbar: measure('[data-testid="connections-list-toolbar"]'),
+        };
+      });
+
+      expect(layout.documentScrollWidth, `document overflow at ${width}px`).toBeLessThanOrEqual(
+        layout.viewportWidth + 1
+      );
+      for (const [name, box] of [
+        ["row", layout.row],
+        ["toolbar", layout.toolbar],
+      ] as const) {
+        expect(box, `${name} missing at ${width}px`).not.toBeNull();
+        expect(box!.left, `${name} crosses left edge at ${width}px`).toBeGreaterThanOrEqual(-1);
+        expect(box!.right, `${name} crosses right edge at ${width}px`).toBeLessThanOrEqual(
+          layout.viewportWidth + 1
+        );
+        expect(box!.scrollWidth, `${name} clips content at ${width}px`).toBeLessThanOrEqual(
+          box!.clientWidth + 1
+        );
+      }
+
+      if (width < 1024) {
+        for (const region of [settings, actions]) {
+          const hitTargets = region.locator("button:visible");
+          for (let index = 0; index < (await hitTargets.count()); index += 1) {
+            const box = await hitTargets.nth(index).boundingBox();
+            expect(box, `missing touch target at ${width}px`).not.toBeNull();
+            expect(box!.height, `short touch target at ${width}px`).toBeGreaterThanOrEqual(43);
+          }
+        }
+      }
+
+      const visibleSeparators = await settings
+        .locator("span.select-none")
+        .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).display !== "none"));
+      expect(visibleSeparators, `orphan separators at ${width}px`).toHaveLength(0);
+
+      if (width === 390) {
+        await page.screenshot({
+          path: testInfo.outputPath("provider-account-390.png"),
+          fullPage: true,
+        });
+      }
+    }
   });
 });

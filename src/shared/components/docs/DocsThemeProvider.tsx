@@ -14,7 +14,7 @@ export default function DocsThemeProvider({
   initialTheme = "system",
 }: ThemeProviderProps) {
   return (
-    <div className="min-h-screen bg-bg text-text-main font-sans selection:bg-primary/20">
+    <div className="min-h-dvh bg-bg text-text-main font-sans selection:bg-primary/20">
       {children}
     </div>
   );

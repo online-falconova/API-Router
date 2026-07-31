@@ -15,7 +15,7 @@ export default function PrivacyPage() {
   const t = useTranslations("legal");
 
   return (
-    <main className="min-h-screen text-text-main">
+    <main className="min-h-dvh text-text-main">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link
           href="/"

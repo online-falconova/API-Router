@@ -159,7 +159,7 @@ export default function ConnectionsListPanel({
   const someSelected = selectedIds.size > 0 && selectedIds.size < connections.length;
   const bulkBusy = batchUpdating !== null || batchRetesting || batchDeleting || batchTesting;
   const bulkActions = selectedIds.size > 0 && (
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <div className="grid w-full grid-cols-2 items-center gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end [&>button]:w-full sm:[&>button]:w-auto">
       <Button
         variant="secondary"
         size="sm"
@@ -238,8 +238,11 @@ export default function ConnectionsListPanel({
   const pageEnd = pageStart + PAGE_SIZE;
 
   const accountSearchInput = (
-    <div className="relative min-w-[160px] max-w-[220px]">
-      <span className="material-symbols-outlined pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[15px] text-text-muted">
+    <div className="relative w-full min-w-0 sm:w-auto sm:min-w-[160px] sm:max-w-[220px]">
+      <span
+        className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-text-muted"
+        aria-hidden="true"
+      >
         search
       </span>
       <input
@@ -248,22 +251,23 @@ export default function ConnectionsListPanel({
         onChange={(e) => setAccountSearch(e.target.value)}
         placeholder={t("accountSearchPlaceholder", "Search accounts…")}
         aria-label={t("accountSearchPlaceholder", "Search accounts…")}
-        className="w-full rounded-lg border border-border bg-sidebar/50 py-1.5 pl-7 pr-3 text-xs text-text-main placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
+        className="min-h-11 w-full rounded-lg border border-border bg-sidebar/50 py-2 pl-10 pr-3 text-sm text-text-main placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary sm:min-h-0 sm:py-1.5 sm:pl-8 sm:text-xs"
       />
     </div>
   );
 
   const filterPills = (
-    <div className="flex items-center gap-1.5 flex-wrap">
+    <div className="flex w-full max-w-full items-center gap-1.5 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:overflow-visible sm:pb-0">
       {STATUS_FILTER_OPTIONS.map((opt) => (
         <button
+          type="button"
           key={opt.value}
           onClick={() => {
             setHealthFilter(opt.value);
             setPage(0);
             setSelectedIds(new Set());
           }}
-          className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
+          className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium transition-colors sm:min-h-0 sm:px-2.5 ${
             healthFilter === opt.value
               ? "bg-primary text-white"
               : "bg-muted/60 text-text-muted hover:bg-muted"
@@ -310,9 +314,12 @@ export default function ConnectionsListPanel({
     const someSelectedPage = pageConnections.some((c) => selectedIds.has(c.id));
     return (
       <>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 py-2 bg-muted/50 rounded-t-lg border border-b-0 border-border">
-          <div className="flex items-center gap-2 flex-wrap">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
+        <div
+          data-testid="connections-list-toolbar"
+          className="flex min-w-0 flex-col items-stretch gap-3 rounded-t-lg border border-b-0 border-border bg-muted/50 px-3 py-3"
+        >
+          <div className="grid min-w-0 w-full grid-cols-1 items-center gap-3 sm:grid-cols-[auto_minmax(160px,220px)] lg:grid-cols-[auto_minmax(160px,220px)_minmax(0,1fr)]">
+            <label className="flex min-h-11 min-w-0 cursor-pointer select-none items-center gap-2 sm:min-h-0">
               <input
                 type="checkbox"
                 checked={allSelectedPage}
@@ -362,7 +369,7 @@ export default function ConnectionsListPanel({
           {bulkActions}
         </div>
         {paginationBar}
-        <div className="flex flex-col divide-y divide-black/[0.03] dark:divide-white/[0.03] border border-t-0 border-border rounded-b-lg overflow-hidden">
+        <div className="flex min-w-0 flex-col divide-y divide-black/[0.03] rounded-b-lg border border-t-0 border-border dark:divide-white/[0.03]">
           {pageConnections.length === 0 ? (
             <div className="px-3 py-6 text-center text-sm text-text-muted">
               {t("noFilteredConnections", "No connections match the current filter.")}
@@ -487,9 +494,12 @@ export default function ConnectionsListPanel({
   return (
     <>
       {selectedIds.size > 0 || connections.length > 0 ? (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 py-2 bg-muted/50 rounded-t-lg border border-b-0 border-border">
-          <div className="flex items-center gap-2 flex-wrap">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
+        <div
+          data-testid="connections-list-toolbar"
+          className="flex min-w-0 flex-col items-stretch gap-3 rounded-t-lg border border-b-0 border-border bg-muted/50 px-3 py-3"
+        >
+          <div className="grid min-w-0 w-full grid-cols-1 items-center gap-3 sm:grid-cols-[auto_minmax(160px,220px)] lg:grid-cols-[auto_minmax(160px,220px)_minmax(0,1fr)]">
+            <label className="flex min-h-11 min-w-0 cursor-pointer select-none items-center gap-2 sm:min-h-0">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -521,7 +531,7 @@ export default function ConnectionsListPanel({
             {filterPills}
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex min-w-0 w-full flex-wrap items-center justify-start gap-2 sm:justify-end">
             {/* Distribute Proxies lives in the provider toolbar (top action bar);
                 removed the duplicate here that rendered simultaneously when nothing
                 was selected. Per-tag groups keep their own scoped button. */}
@@ -530,7 +540,7 @@ export default function ConnectionsListPanel({
         </div>
       ) : null}
       {paginationBar}
-      <div className="flex flex-col gap-0 border border-t-0 border-border rounded-b-lg overflow-hidden">
+      <div className="flex min-w-0 flex-col gap-0 rounded-b-lg border border-t-0 border-border">
         {visibleGroupKeys.map((tag, gi) => {
           const groupConns = pagedGroupMap.get(tag)!;
           const groupTotal = groupMap.get(tag)!.length;
@@ -542,11 +552,14 @@ export default function ConnectionsListPanel({
               }
             >
               {tag && (
-                <div className="flex items-center gap-2 px-3 pt-2 pb-1">
-                  <span className="material-symbols-outlined text-[13px] text-text-muted/50">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 px-3 pb-1 pt-2">
+                  <span
+                    className="material-symbols-outlined shrink-0 text-[13px] text-text-muted/50"
+                    aria-hidden="true"
+                  >
                     label
                   </span>
-                  <span className="text-[11px] font-semibold uppercase tracking-widest text-text-muted/60 select-none">
+                  <span className="min-w-0 max-w-full break-words text-[11px] font-semibold uppercase tracking-widest text-text-muted/60 select-none">
                     {tag}
                   </span>
                   <div className="flex-1 h-px bg-black/[0.04] dark:bg-white/[0.04]" />

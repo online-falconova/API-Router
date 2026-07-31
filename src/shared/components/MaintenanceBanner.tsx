@@ -20,46 +20,80 @@ export default function MaintenanceBanner() {
   const t = useTranslations("common");
 
   useEffect(() => {
-    const checkHealth = async () => {
+    let cancelled = false;
+
+    // A single probe against the lightweight liveness endpoint (single SELECT 1)
+    // rather than the heavy /api/monitoring/health snapshot, which can exceed
+    // the client timeout under load and cause false-positive banners.
+    // Returns "ok" | "issues" (HTTP non-2xx) | "unreachable" (network/timeout).
+    const pingOnce = async (timeoutMs: number): Promise<"ok" | "issues" | "unreachable"> => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort("Health check timeout"), 8000);
+      const timeoutId = setTimeout(() => controller.abort("Health check timeout"), timeoutMs);
       try {
-        // Use lightweight liveness probe (single SELECT 1) instead of the
-        // heavy /api/monitoring/health observability endpoint. The heavy
-        // endpoint can exceed the 8s client timeout under normal load
-        // (e.g. Logs page 3s polling), causing false-positive banners.
         const res = await fetch("/api/health/ping", {
           signal: controller.signal,
           cache: "no-store",
         });
-        if (res.ok) {
-          consecutiveFailuresRef.current = 0;
-          dismissedUntilRecoveryRef.current = false;
-          setShow(false);
-          setMessage("");
-        } else {
-          consecutiveFailuresRef.current += 1;
-          // Require at least 2 failed checks to avoid transient false positives.
-          if (consecutiveFailuresRef.current >= 2 && !dismissedUntilRecoveryRef.current) {
-            setShow(true);
-            setMessage(t("maintenanceServerIssues"));
-          }
-        }
+        return res.ok ? "ok" : "issues";
       } catch {
-        consecutiveFailuresRef.current += 1;
-        if (consecutiveFailuresRef.current >= 2 && !dismissedUntilRecoveryRef.current) {
-          setShow(true);
-          setMessage(t("maintenanceServerUnreachable"));
-        }
+        return "unreachable";
       } finally {
         clearTimeout(timeoutId);
       }
     };
 
-    // Run immediately on mount, then every 10 seconds
+    const checkHealth = async () => {
+      // One immediate in-cycle retry before counting a failure. This smooths
+      // over transient blips — dev recompiles, brief GC pauses, a single
+      // dropped request — that would otherwise flash a scary "unreachable"
+      // banner even though the server is healthy.
+      let status = await pingOnce(8000);
+      if (status !== "ok" && !cancelled) {
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+        status = await pingOnce(8000);
+      }
+      if (cancelled) return;
+
+      if (status === "ok") {
+        consecutiveFailuresRef.current = 0;
+        dismissedUntilRecoveryRef.current = false;
+        setShow(false);
+        setMessage("");
+        return;
+      }
+
+      consecutiveFailuresRef.current += 1;
+      // Require 3 consecutive failed cycles (each already retried once) before
+      // surfacing the banner — a genuine outage still shows within ~30s, but
+      // routine restarts and recompiles never trip it.
+      if (consecutiveFailuresRef.current >= 3 && !dismissedUntilRecoveryRef.current) {
+        setShow(true);
+        setMessage(
+          status === "unreachable"
+            ? t("maintenanceServerUnreachable")
+            : t("maintenanceServerIssues")
+        );
+      }
+    };
+
+    // Run immediately on mount, then every 10 seconds.
     checkHealth();
     const interval = setInterval(checkHealth, 10000);
-    return () => clearInterval(interval);
+
+    // Re-check promptly when the tab regains focus or the network comes back,
+    // so a recovered server clears the banner without waiting for the next poll.
+    const onWake = () => {
+      if (document.visibilityState === "visible") void checkHealth();
+    };
+    window.addEventListener("online", onWake);
+    document.addEventListener("visibilitychange", onWake);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      window.removeEventListener("online", onWake);
+      document.removeEventListener("visibilitychange", onWake);
+    };
   }, [t]);
 
   if (!show) return null;

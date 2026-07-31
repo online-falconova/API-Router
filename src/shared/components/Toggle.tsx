@@ -71,25 +71,30 @@ export default function Toggle({
         disabled={disabled}
         onClick={handleClick}
         className={cn(
-          "relative inline-flex shrink-0 cursor-pointer rounded-full",
+          "inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-full",
           "transition-colors duration-200 ease-in-out",
-          "border neu-inset-sm",
-          "focus:outline-none focus:ring-1 focus:ring-accent/30",
-          checked ? "border-primary bg-primary" : "border-border bg-surface-2 dark:bg-white/20",
-          sizes[size].track,
+          "focus:outline-none focus:ring-2 focus:ring-accent/40",
           disabled && "cursor-not-allowed"
         )}
       >
         <span
           aria-hidden="true"
           className={cn(
-            "pointer-events-none inline-block rounded-full bg-white shadow-sm",
-            "transform transition duration-200 ease-in-out",
-            checked ? sizes[size].translate : "translate-x-0.5",
-            sizes[size].thumb,
-            "mt-0.5"
+            "relative inline-flex shrink-0 rounded-full border neu-inset-sm",
+            checked ? "border-primary bg-primary" : "border-border bg-surface-2 dark:bg-white/20",
+            sizes[size].track
           )}
-        />
+        >
+          <span
+            className={cn(
+              "pointer-events-none inline-block rounded-full bg-white shadow-sm",
+              "transform transition duration-200 ease-in-out",
+              checked ? sizes[size].translate : "translate-x-0.5",
+              sizes[size].thumb,
+              "mt-0.5"
+            )}
+          />
+        </span>
       </button>
       {(label || description) && (
         <div className="flex flex-col">

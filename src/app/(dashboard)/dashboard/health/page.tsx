@@ -465,7 +465,7 @@ export default function HealthPage() {
               {t("activeCount", { count: sessions?.activeCount ?? 0 })}
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-1 gap-3 mb-4 sm:grid-cols-2">
             <div className="rounded-xl border border-border/40 bg-surface/30 p-3">
               <div className="text-xs text-text-muted">{t("stickyBoundSessions")}</div>
               <div className="text-2xl font-semibold text-text-main mt-1">
@@ -706,7 +706,7 @@ export default function HealthPage() {
             {t("signatureCache")}
           </h3>
           {signatureCache ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {[
                 {
                   label: t("signatureDefaults"),

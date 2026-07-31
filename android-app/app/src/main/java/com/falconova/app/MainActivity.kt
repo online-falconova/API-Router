@@ -35,6 +35,19 @@ class MainActivity : AppCompatActivity() {
     private var pageReady = false
     private var splashHidden = false
 
+    // Double-back-to-exit: timestamp of the last "would exit" back press + its toast.
+    private var lastBackPressTime = 0L
+    private var backToast: Toast? = null
+
+    /**
+     * Whether the web page's active scroll container is at its very top.
+     * Reported from JS because the dashboard scrolls an inner `overflow-y:auto`
+     * element (the document itself never scrolls, so [WebView.getScrollY] stays 0).
+     * Written from the JS bridge thread, read on the UI thread → @Volatile.
+     */
+    @Volatile
+    private var contentAtTop = true
+
     private val fileChooserLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val callback = filePathCallback ?: return@registerForActivityResult
@@ -79,6 +92,16 @@ class MainActivity : AppCompatActivity() {
         binding.swipeRefresh.setColorSchemeResources(R.color.brand_accent)
         binding.swipeRefresh.setOnRefreshListener { binding.webView.reload() }
 
+        // Eligibility is captured by EdgeSwipeRefreshLayout on ACTION_DOWN.
+        // A refresh can only begin inside the top 48dp while both the WebView
+        // and the page's active nested scroll container are already at the top.
+        binding.swipeRefresh.canStartRefresh = {
+            binding.webView.scrollY == 0 && contentAtTop
+        }
+        binding.swipeRefresh.setOnChildScrollUpCallback { _, _ ->
+            binding.webView.scrollY > 0 || !contentAtTop
+        }
+
         setupBackNavigation()
 
         if (savedInstanceState == null) {
@@ -105,6 +128,12 @@ class MainActivity : AppCompatActivity() {
             setAcceptCookie(true)
             setAcceptThirdPartyCookies(webView, true)
         }
+
+        // Bridge used only so the page can tell us whether its scroll container is at
+        // the top (see [contentAtTop]). Exposes a single boolean setter and no other
+        // capability; in-app navigation is restricted to APP_HOST by
+        // shouldOverrideUrlLoading, so no third-party page can reach it.
+        webView.addJavascriptInterface(PullRefreshBridge(), JS_BRIDGE_NAME)
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(
@@ -133,6 +162,10 @@ class MainActivity : AppCompatActivity() {
                 binding.swipeRefresh.isRefreshing = false
                 binding.progressBar.visibility = View.GONE
                 hideSplash()
+                // A freshly loaded page starts at the top; the injected script keeps
+                // this in sync from then on.
+                contentAtTop = true
+                view.evaluateJavascript(SCROLL_TRACKER_JS, null)
             }
 
             override fun onReceivedError(
@@ -215,11 +248,29 @@ class MainActivity : AppCompatActivity() {
     private fun setupBackNavigation() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                // While there is web history, back navigates the page as usual.
                 if (binding.webView.canGoBack()) {
                     binding.webView.goBack()
-                } else {
+                    return
+                }
+                // No history left → a back press would close the app. Require a
+                // second press/swipe within the window to actually exit; the first
+                // one just warns. This applies to both the button and the gesture.
+                val now = System.currentTimeMillis()
+                if (now - lastBackPressTime <= BACK_EXIT_WINDOW_MS) {
+                    backToast?.cancel()
                     isEnabled = false
                     onBackPressedDispatcher.onBackPressed()
+                } else {
+                    lastBackPressTime = now
+                    backToast?.cancel()
+                    backToast =
+                        Toast.makeText(
+                            this@MainActivity,
+                            R.string.press_back_again,
+                            Toast.LENGTH_SHORT
+                        )
+                    backToast?.show()
                 }
             }
         })
@@ -341,9 +392,92 @@ class MainActivity : AppCompatActivity() {
             .start()
     }
 
+    /** Minimal JS→native bridge: the page reports whether it is scrolled to the top. */
+    private inner class PullRefreshBridge {
+        @android.webkit.JavascriptInterface
+        fun setAtTop(atTop: Boolean) {
+            contentAtTop = atTop
+        }
+    }
+
     companion object {
         // All subdomains of this host stay inside the app.
         private const val APP_HOST = "falconova.com"
         private const val SPLASH_TIMEOUT_MS = 9000L
+        private const val JS_BRIDGE_NAME = "AndroidPull"
+
+        // Window within which a second back press exits the app.
+        private const val BACK_EXIT_WINDOW_MS = 2000L
+
+        /**
+         * Reports to native whether the page's active scroll container sits at the top.
+         *
+         * The dashboard scrolls a nested `overflow-y:auto` element rather than the
+         * document, so native cannot observe it. A capture-phase `scroll` listener on
+         * `document` sees those nested scrolls too, and `touchstart` refines which
+         * container the finger is actually over. Idempotent: re-injection after an SPA
+         * navigation is a no-op thanks to the install guard.
+         */
+        private val SCROLL_TRACKER_JS =
+            """
+            (function () {
+              if (window.__omniPullRefreshInstalled) { return; }
+              window.__omniPullRefreshInstalled = true;
+
+              function report(atTop) {
+                try { $JS_BRIDGE_NAME.setAtTop(!!atTop); } catch (e) {}
+              }
+
+              function isScrollable(el) {
+                if (!el || el.nodeType !== 1) return false;
+                if (el === document.body || el === document.documentElement) return false;
+                var st = window.getComputedStyle(el);
+                var oy = st.overflowY;
+                if (oy !== 'auto' && oy !== 'scroll') return false;
+                return el.scrollHeight > el.clientHeight + 1;
+              }
+
+              function scrollableAncestor(el) {
+                while (el && el.nodeType === 1) {
+                  if (isScrollable(el)) return el;
+                  el = el.parentElement;
+                }
+                return null;
+              }
+
+              function docAtTop() {
+                var d = document.scrollingElement || document.documentElement;
+                return (window.pageYOffset || (d && d.scrollTop) || 0) <= 0;
+              }
+
+              // Source of truth: any scroll (including nested containers) updates the flag.
+              document.addEventListener(
+                'scroll',
+                function (e) {
+                  var t = e.target;
+                  if (t && t.nodeType === 1 && isScrollable(t)) {
+                    report(t.scrollTop <= 0);
+                  } else {
+                    report(docAtTop());
+                  }
+                },
+                true
+              );
+
+              // Refine per-gesture: use the container under the finger.
+              document.addEventListener(
+                'touchstart',
+                function (e) {
+                  var touch = e.touches && e.touches[0];
+                  var target = touch ? touch.target : e.target;
+                  var sc = scrollableAncestor(target);
+                  report(sc ? sc.scrollTop <= 0 : docAtTop());
+                },
+                true
+              );
+
+              report(docAtTop());
+            })();
+            """
     }
 }

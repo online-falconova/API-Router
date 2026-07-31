@@ -96,12 +96,12 @@ export default function ConnectionsHeaderToolbar({
   t,
 }: ConnectionsHeaderToolbarProps) {
   return (
-    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
+    <div className="mb-4 flex min-w-0 flex-col gap-3 sm:items-stretch lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex min-w-0 w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto">
         <h2 className="text-lg font-semibold">{t("connections")}</h2>
         {providerId === "claude" && (
           <div
-            className="inline-flex items-center gap-2 rounded-lg border border-orange-500/20 bg-orange-500/5 px-2 py-1 text-xs font-medium text-text-muted"
+            className="flex min-h-11 w-full min-w-0 max-w-full flex-wrap items-center gap-2 rounded-lg border border-orange-500/20 bg-orange-500/5 px-2 py-1 text-xs font-medium text-text-muted sm:w-auto"
             title={providerText(
               t,
               "preferClaudeCodeForUnprefixedClaudeModelsTooltip",
@@ -159,7 +159,7 @@ export default function ConnectionsHeaderToolbar({
         )}
         {providerId === "codex" && (
           <div
-            className="inline-flex items-center gap-2 rounded-lg border border-sky-500/20 bg-sky-500/5 px-2 py-1 text-xs font-medium text-text-muted"
+            className="flex min-h-11 w-full min-w-0 max-w-full flex-wrap items-center gap-2 rounded-lg border border-sky-500/20 bg-sky-500/5 px-2 py-1 text-xs font-medium text-text-muted sm:w-auto"
             title={providerText(
               t,
               "providerDetailServiceModeTooltip",
@@ -174,7 +174,7 @@ export default function ConnectionsHeaderToolbar({
               }
               disabled={savingCodexGlobalServiceMode || !codexSettingsLoaded}
               aria-label={providerText(t, "globalCodexServiceMode", "Global Codex service mode")}
-              className="rounded-md border border-border bg-bg px-2 py-1 text-xs text-text-main outline-none transition-colors focus:border-primary disabled:opacity-60"
+              className="min-h-9 min-w-0 max-w-full flex-1 rounded-md border border-border bg-bg px-2 py-1 text-xs text-text-main outline-none transition-colors focus:border-primary disabled:opacity-60 sm:flex-none"
             >
               {codexGlobalServiceModeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -203,7 +203,7 @@ export default function ConnectionsHeaderToolbar({
               label: providerInfo?.name || providerId,
             })
           }
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all ${
+          className={`inline-flex min-h-11 w-full min-w-0 max-w-full items-center gap-1 overflow-hidden rounded px-2 py-1 text-xs font-medium transition-all sm:w-auto ${
             proxyConfig?.providers?.[providerId]
               ? "bg-amber-500/15 text-amber-500 hover:bg-amber-500/25"
               : "bg-black/[0.03] dark:bg-white/[0.03] text-text-muted/50 hover:text-text-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06]"
@@ -222,7 +222,7 @@ export default function ConnectionsHeaderToolbar({
             : t("providerProxy")}
         </button>
       </div>
-      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+      <div className="flex w-full min-w-0 flex-wrap items-center justify-start gap-2 [&>button]:flex-1 sm:[&>button]:flex-none lg:w-auto lg:shrink-0 lg:justify-end">
         {connections.length > 0 && (
           <DistributeProxiesButton
             onDistribute={async () => {

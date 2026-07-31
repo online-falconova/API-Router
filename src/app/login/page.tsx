@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { useState, useEffect } from "react";
 import { Button, Input } from "@/shared/components";
-import { useRouter } from "next/navigation";
+import OmniRouteLogo from "@/shared/components/OmniRouteLogo";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -124,7 +125,7 @@ export default function LoginPage() {
     ) : null;
   if (hasPassword === null || setupComplete === null || oidcEnabled === null) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="min-h-dvh flex flex-col items-center justify-center p-4 sm:p-6">
         {nodeWarningBanner}
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
@@ -139,7 +140,7 @@ export default function LoginPage() {
 
   if (!hasPassword && !setupComplete) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="min-h-dvh flex flex-col items-center justify-center p-4 sm:p-6">
         {nodeWarningBanner}
         <div
           className={`w-full max-w-md transition-all duration-700 ease-out ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -177,7 +178,7 @@ export default function LoginPage() {
 
   if (!hasPassword && setupComplete) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="min-h-dvh flex flex-col items-center justify-center p-4 sm:p-6">
         {nodeWarningBanner}
         <div
           className={`w-full max-w-md transition-all duration-700 ease-out ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -216,7 +217,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       {nodeWarningBanner && (
         <div className="flex justify-center pt-6 px-6">{nodeWarningBanner}</div>
       )}
@@ -227,12 +228,7 @@ export default function LoginPage() {
           >
             <div className="mb-10">
               <div className="flex items-center gap-3 mb-8">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/brand-logo.png"
-                  alt="API Router"
-                  className="h-10 w-auto object-contain"
-                />
+                <OmniRouteLogo size={44} className="shrink-0" />
                 <span className="text-xl font-semibold text-text-main tracking-tight">
                   API Router
                 </span>

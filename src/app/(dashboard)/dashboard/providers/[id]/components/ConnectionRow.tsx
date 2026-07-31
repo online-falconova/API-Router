@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Badge, Button, Toggle } from "@/shared/components";
 import { pickDisplayValue } from "@/shared/utils/maskEmail";
+import { cn } from "@/shared/utils/cn";
 import useEmailPrivacyStore from "@/store/emailPrivacyStore";
 import { isClaudeExtraUsageBlockEnabled } from "@/lib/providers/claudeExtraUsage";
 import { shouldShowConnectionLastError } from "./connectionRowHelpers";
@@ -15,11 +16,7 @@ import {
   getCodexEffectiveServiceTier,
   type CodexGlobalServiceMode,
 } from "@/lib/providers/codexFastTier";
-import {
-  normalizeCodexLimitPolicy,
-  providerText,
-  ERROR_TYPE_LABELS,
-} from "../providerPageHelpers";
+import { normalizeCodexLimitPolicy, providerText, ERROR_TYPE_LABELS } from "../providerPageHelpers";
 import { getCodexPlanLabel } from "../codexPlanLabel";
 import ProviderQuotaVisibilityToggle from "./ProviderQuotaVisibilityToggle";
 
@@ -245,7 +242,7 @@ function getStatusPresentation(
   if (errorType === "account_deactivated") {
     return {
       statusVariant: "error",
-      statusLabel: t("statusDeactivated", "Deactivated"),
+      statusLabel: providerText(t, "statusDeactivated", "Deactivated"),
       errorType,
       errorBadge,
       errorTextClass: "text-red-600 font-bold",
@@ -300,7 +297,7 @@ function getStatusPresentation(
   if (errorType === "banned") {
     return {
       statusVariant: "error",
-      statusLabel: t("statusBanned", "Banned (403)"),
+      statusLabel: providerText(t, "statusBanned", "Banned (403)"),
       errorType,
       errorBadge,
       errorTextClass: "text-red-600 font-bold",
@@ -310,7 +307,7 @@ function getStatusPresentation(
   if (errorType === "credits_exhausted") {
     return {
       statusVariant: "warning",
-      statusLabel: t("statusCreditsExhausted", "Out of Credits"),
+      statusLabel: providerText(t, "statusCreditsExhausted", "Out of Credits"),
       errorType,
       errorBadge,
       errorTextClass: "text-amber-500",
@@ -517,41 +514,68 @@ export default function ConnectionRow({
 
   return (
     <div
-      className={`group flex items-center justify-between p-3 rounded-lg hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${connection.isActive === false ? "opacity-60" : ""}`}
+      data-testid="connection-row"
+      className={cn(
+        "group grid min-w-0 gap-3 rounded-xl p-3 transition-colors",
+        "hover:bg-black/[0.02] dark:hover:bg-white/[0.02]",
+        "lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center",
+        connection.isActive === false && "opacity-60"
+      )}
     >
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex min-w-0 w-full items-start gap-2 sm:gap-3">
         {onToggleSelect && (
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={onToggleSelect}
-            className="w-4 h-4 shrink-0 rounded border-border text-primary focus:ring-primary/30 cursor-pointer"
-          />
+          <label className="-my-2 -ms-2 flex size-11 shrink-0 cursor-pointer items-center justify-center lg:my-0 lg:ms-0 lg:size-auto">
+            <span className="sr-only">Select {displayName}</span>
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onToggleSelect}
+              className="size-4 shrink-0 cursor-pointer rounded border-border text-primary focus:ring-primary/30"
+            />
+          </label>
         )}
-        {/* Priority arrows */}
-        <div className="flex flex-col">
+        {/* Compact desktop ordering controls. Mobile controls live in the action section. */}
+        <div className="hidden shrink-0 flex-col lg:flex">
           <button
+            type="button"
             onClick={onMoveUp}
             disabled={isFirst}
-            className={`p-0.5 rounded ${isFirst ? "text-text-muted/30 cursor-not-allowed" : "hover:bg-sidebar text-text-muted hover:text-primary"}`}
+            aria-label="Move connection up"
+            className={`flex items-center justify-center rounded p-1 ${isFirst ? "cursor-not-allowed text-text-muted/30" : "text-text-muted hover:bg-sidebar hover:text-primary"}`}
           >
-            <span className="material-symbols-outlined text-sm">keyboard_arrow_up</span>
+            <span className="material-symbols-outlined text-sm" aria-hidden="true">
+              keyboard_arrow_up
+            </span>
           </button>
           <button
+            type="button"
             onClick={onMoveDown}
             disabled={isLast}
-            className={`p-0.5 rounded ${isLast ? "text-text-muted/30 cursor-not-allowed" : "hover:bg-sidebar text-text-muted hover:text-primary"}`}
+            aria-label="Move connection down"
+            className={`flex items-center justify-center rounded p-1 ${isLast ? "cursor-not-allowed text-text-muted/30" : "text-text-muted hover:bg-sidebar hover:text-primary"}`}
           >
-            <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+            <span className="material-symbols-outlined text-sm" aria-hidden="true">
+              keyboard_arrow_down
+            </span>
           </button>
         </div>
-        <span className="material-symbols-outlined text-base text-text-muted">
+        <span
+          className="material-symbols-outlined hidden shrink-0 text-base text-text-muted sm:inline-block"
+          aria-hidden="true"
+        >
           {isOAuth ? "lock" : "key"}
         </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{displayName}</p>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <Badge variant={statusPresentation.statusVariant as any} size="sm" dot>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{displayName}</p>
+          <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-1.5">
+            <Badge
+              variant={
+                statusPresentation.statusVariant as
+                  "default" | "success" | "warning" | "error" | "primary" | "info"
+              }
+              size="sm"
+              dot
+            >
               {statusPresentation.statusLabel}
             </Badge>
             {codexPlanLabel && (
@@ -588,13 +612,19 @@ export default function ConnectionRow({
               <CooldownTimer until={connection.rateLimitedUntil!} />
             )}
             {statusPresentation.errorBadge && connection.isActive !== false && (
-              <Badge variant={statusPresentation.errorBadge.variant} size="sm">
+              <Badge
+                variant={
+                  statusPresentation.errorBadge.variant as
+                    "default" | "success" | "warning" | "error" | "primary" | "info"
+                }
+                size="sm"
+              >
                 {t(statusPresentation.errorBadge.labelKey)}
               </Badge>
             )}
             {shouldShowConnectionLastError(connection) && (
               <span
-                className={`text-xs truncate max-w-[300px] ${statusPresentation.errorTextClass}`}
+                className={`w-full min-w-0 break-words text-xs sm:w-auto sm:max-w-[300px] sm:truncate ${statusPresentation.errorTextClass}`}
                 title={connection.lastError}
               >
                 {connection.lastError}
@@ -608,16 +638,31 @@ export default function ConnectionRow({
             )}
             {connection.maxConcurrent != null && connection.maxConcurrent > 0 && (
               <span
-                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-zinc-500/15 text-zinc-500 dark:bg-zinc-400/15 dark:text-zinc-400"
+                className="inline-flex items-center gap-0.5 whitespace-nowrap rounded bg-zinc-500/15 px-1.5 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-400/15 dark:text-zinc-400"
                 title={t("accountConcurrencyCapLabel")}
               >
-                <span className="material-symbols-outlined text-[11px]">dynamic_feed</span>
+                <span className="material-symbols-outlined text-[11px]" aria-hidden="true">
+                  dynamic_feed
+                </span>
                 {connection.maxConcurrent}
               </span>
             )}
-            {/* Rate Limit Protection — inline toggle with label */}
-            <span className="text-text-muted/30 select-none">|</span>
+          </div>
+
+          <div
+            className={cn(
+              "mt-2 flex min-w-0 max-w-full flex-wrap items-center gap-1.5 border-t border-border/40 pt-2",
+              "[&>.select-none]:hidden",
+              "[&>button]:min-h-11 [&>button]:max-w-full [&>button]:whitespace-nowrap [&>button]:px-2",
+              "lg:border-t-0 lg:pt-0 lg:[&>button]:min-h-7"
+            )}
+            data-testid="connection-settings"
+            role="group"
+            aria-label="Connection settings"
+          >
+            {/* Rate-limit and account-level settings are grouped separately from status metadata. */}
             <button
+              type="button"
               onClick={() => onToggleRateLimit(!rateLimitEnabled)}
               className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium transition-all cursor-pointer ${
                 rateLimitEnabled
@@ -793,7 +838,47 @@ export default function ConnectionRow({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div
+        data-testid="connection-actions"
+        className={cn(
+          "grid w-full min-w-0 grid-cols-2 gap-2 border-t border-border/50 pt-3 [&>button]:min-h-11",
+          "sm:grid-cols-[repeat(3,minmax(0,auto))] sm:justify-start",
+          "lg:flex lg:w-auto lg:flex-nowrap lg:items-center lg:justify-end lg:border-t-0 lg:pt-0 lg:[&>button]:min-h-0"
+        )}
+      >
+        <div className="col-span-2 flex items-center justify-start rounded-lg border border-border/50 bg-black/[0.02] dark:bg-white/[0.02] sm:col-span-1 lg:hidden">
+          <button
+            type="button"
+            onClick={onMoveUp}
+            disabled={isFirst}
+            aria-label="Move connection up"
+            className={cn(
+              "flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-lg text-text-muted",
+              isFirst ? "cursor-not-allowed opacity-30" : "hover:bg-sidebar hover:text-primary"
+            )}
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">
+              keyboard_arrow_up
+            </span>
+          </button>
+          <span className="px-2 text-xs font-medium text-text-muted" aria-hidden="true">
+            #{connection.priority}
+          </span>
+          <button
+            type="button"
+            onClick={onMoveDown}
+            disabled={isLast}
+            aria-label="Move connection down"
+            className={cn(
+              "flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-lg text-text-muted",
+              isLast ? "cursor-not-allowed opacity-30" : "hover:bg-sidebar hover:text-primary"
+            )}
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">
+              keyboard_arrow_down
+            </span>
+          </button>
+        </div>
         <Button
           size="sm"
           variant="ghost"
@@ -882,37 +967,54 @@ export default function ConnectionRow({
           checked={connection.isActive ?? true}
           onChange={onToggleActive}
           title={(connection.isActive ?? true) ? t("disableConnection") : t("enableConnection")}
+          className="min-h-11 justify-center rounded-lg border border-border/50 px-2 lg:min-h-0 lg:border-0 lg:px-0"
         />
-        <div className="flex gap-1 ms-1 transition-opacity">
+        <div className="col-span-2 grid grid-cols-4 gap-1 rounded-lg border border-border/50 p-1 transition-opacity sm:col-span-1 lg:ms-1 lg:flex lg:border-0 lg:p-0">
           {onReauth && (
             <button
+              type="button"
               onClick={onReauth}
-              className="p-2 hover:bg-amber-500/10 rounded text-amber-600 hover:text-amber-500"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded text-amber-600 hover:bg-amber-500/10 hover:text-amber-500 lg:min-h-0 lg:min-w-0 lg:p-2"
               title={t("reauthenticateConnection")}
+              aria-label={t("reauthenticateConnection")}
             >
-              <span className="material-symbols-outlined text-[18px]">passkey</span>
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                passkey
+              </span>
             </button>
           )}
           <button
+            type="button"
             onClick={onEdit}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded text-text-muted hover:bg-black/5 hover:text-primary dark:hover:bg-white/5 lg:min-h-0 lg:min-w-0 lg:p-2"
             title={t("edit")}
+            aria-label={t("edit")}
           >
-            <span className="material-symbols-outlined text-[18px]">edit</span>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              edit
+            </span>
           </button>
           <button
+            type="button"
             onClick={onProxy}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded text-text-muted hover:bg-black/5 hover:text-primary dark:hover:bg-white/5 lg:min-h-0 lg:min-w-0 lg:p-2"
             title={t("proxyConfig")}
+            aria-label={t("proxyConfig")}
           >
-            <span className="material-symbols-outlined text-[18px]">vpn_lock</span>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              vpn_lock
+            </span>
           </button>
           <button
+            type="button"
             onClick={onDelete}
-            className="p-2 hover:bg-red-500/10 rounded text-red-500"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded text-red-500 hover:bg-red-500/10 lg:min-h-0 lg:min-w-0 lg:p-2"
             title={t("delete")}
+            aria-label={t("delete")}
           >
-            <span className="material-symbols-outlined text-[18px]">delete</span>
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              delete
+            </span>
           </button>
         </div>
       </div>

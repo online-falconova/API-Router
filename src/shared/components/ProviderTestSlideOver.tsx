@@ -89,7 +89,7 @@ function ProviderTestSlideOverPanel({
       <div
         role="dialog"
         aria-label={`Test ${provider.name}`}
-        className="relative w-full sm:w-[640px] md:w-[720px] lg:w-[820px] max-w-full bg-surface border-l border-black/10 dark:border-white/10 shadow-2xl flex flex-col animate-in slide-in-from-right duration-200"
+        className="relative w-full sm:w-[640px] md:w-[720px] lg:w-[820px] max-w-full bg-surface border-l border-black/10 dark:border-white/10 neu-raised flex flex-col animate-in slide-in-from-right duration-200"
       >
         <SlideOverHeader
           provider={provider}

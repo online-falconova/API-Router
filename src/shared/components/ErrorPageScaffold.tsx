@@ -31,11 +31,11 @@ export default function ErrorPageScaffold({
 
   return (
     <main
-      className="min-h-screen text-text-main flex items-center justify-center px-6 py-12"
+      className="min-h-dvh text-text-main flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12"
       role="main"
       aria-labelledby="error-page-title"
     >
-      <section className="w-full max-w-2xl rounded-2xl border border-border bg-surface p-8 sm:p-10 shadow-soft">
+      <section className="w-full max-w-2xl rounded-2xl border border-border bg-surface p-5 shadow-soft sm:p-10">
         <header className="text-center">
           <span className="material-symbols-outlined text-4xl text-primary mb-3" aria-hidden="true">
             {icon}

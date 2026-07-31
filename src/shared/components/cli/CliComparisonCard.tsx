@@ -21,8 +21,8 @@ export default function CliComparisonCard({ currentType }: CliComparisonCardProp
   const types: CliConceptType[] = ["code", "agent", "acp"];
 
   return (
-    <div className="bg-surface border border-black/5 dark:border-white/5 rounded-lg shadow-sm p-4">
-      <div className="grid grid-cols-3 gap-3">
+    <div className="bg-surface border border-black/5 dark:border-white/5 rounded-card neu-raised p-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {types.map((type) => {
           const isCurrent = type === currentType;
           return (

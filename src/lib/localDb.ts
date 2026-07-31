@@ -233,6 +233,8 @@ export {
 
 export type { SkillPatch } from "./db/skills";
 
+export * from "./db/skillCatalog";
+
 export {
   // Read Cache (cached wrappers for hot-read paths)
   getCachedSettings,

@@ -180,6 +180,20 @@ export function resolveNextBuildEnv(baseEnv = process.env, platform = process.pl
   // Turbopack's native (Rust, off-V8-heap) memory, which is the default bundler as of
   // #6283. On memory-constrained machines, set OMNIROUTE_USE_TURBOPACK=0 (webpack
   // fallback) instead of raising this heap value; see docs/reference/ENVIRONMENT.md.
+  // Node 22.0–22.11 gate `require()` of ES modules behind a flag; it is only
+  // unflagged from 22.12.0 / 23.0.0 onward. Turbopack's webpack-loader compat
+  // layer require()s some ESM-only loaders (e.g. fumadocs-mdx's webpack loader),
+  // so on the lower half of the repo's supported Node range (engines allow
+  // >=22.0.0) `next build` throws "require() of ES Module ... not supported".
+  // Enable the flag only when the running Node lacks native support, leaving
+  // 22.12+/24 untouched.
+  if (
+    !process.features?.require_module &&
+    !/--experimental-require-module/.test(env.NODE_OPTIONS || "")
+  ) {
+    env.NODE_OPTIONS = `${env.NODE_OPTIONS || ""} --experimental-require-module`.trim();
+  }
+
   if (!/--max-old-space-size/.test(env.NODE_OPTIONS || "")) {
     // Default 8 GB (was 4 GB): the clean module graph peaks ~3.9 GB during the webpack
     // production pass, which brushed the old 4 GB ceiling on a borderline OOM. 8 GB gives

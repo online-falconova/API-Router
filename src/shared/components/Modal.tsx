@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useId } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
 import Button, { type ButtonVariant } from "./Button";
@@ -9,8 +10,8 @@ import Button, { type ButtonVariant } from "./Button";
 // wrapper only (single scroll owner) and keeps the inner body plain (no
 // independent max-h/overflow), avoiding a double height cap that clips content.
 export const TALL_MODAL_PROPS = {
-  className: "max-h-[90vh] overflow-y-auto",
-  bodyClassName: "p-6",
+  className: "max-h-[calc(100dvh-1.5rem)] overflow-y-auto sm:max-h-[90dvh]",
+  bodyClassName: "p-4 sm:p-6",
 };
 
 interface ModalProps {
@@ -56,6 +57,7 @@ export default function Modal({
   const t = useTranslations("common");
   const titleId = useId();
   const dialogRef = useRef(null);
+  const portalRoot = typeof document === "undefined" ? null : document.body;
 
   const sizes = {
     sm: "max-w-sm",
@@ -124,10 +126,18 @@ export default function Modal({
     return () => dialog.removeEventListener("keydown", handleTab);
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !portalRoot) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4"
+      style={{
+        paddingTop: "max(0.75rem, env(safe-area-inset-top))",
+        paddingRight: "max(0.75rem, env(safe-area-inset-right))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+        paddingLeft: "max(0.75rem, env(safe-area-inset-left))",
+      }}
+    >
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
@@ -142,9 +152,9 @@ export default function Modal({
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         className={cn(
-          "relative w-full bg-surface",
+          "relative w-full max-h-[calc(100dvh-1.5rem)] bg-surface sm:max-h-[calc(100dvh-2rem)]",
           "border border-black/10 dark:border-white/10",
-          "rounded-card shadow-2xl",
+          "rounded-card neu-raised",
           "animate-in fade-in zoom-in-95 duration-200",
           sizes[size],
           className
@@ -155,7 +165,7 @@ export default function Modal({
           <div
             className={cn(
               "flex items-center justify-between border-b border-black/5 dark:border-white/5",
-              compactHeader ? "px-4 py-2.5" : "p-6"
+              compactHeader ? "px-4 py-2.5" : "p-4 sm:p-6"
             )}
           >
             <div className="flex items-center min-w-0">
@@ -189,7 +199,10 @@ export default function Modal({
                 <h2
                   id={titleId}
                   className={cn(
-                    "font-semibold text-text-main truncate min-w-0",
+                    // Wrap instead of truncating so the full title stays readable
+                    // on narrow phones (a single-line `truncate` clipped titles
+                    // like "Shut down API Router" to "S…" at ≤320px widths).
+                    "min-w-0 break-words font-semibold leading-snug text-text-main",
                     compactHeader ? "text-sm" : "text-lg"
                   )}
                 >
@@ -201,7 +214,7 @@ export default function Modal({
               <button
                 onClick={onClose}
                 aria-label={t("close")}
-                className="p-1.5 rounded-lg text-text-muted hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
+                className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-black/5 dark:hover:bg-white/5"
               >
                 <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
                   close
@@ -212,18 +225,24 @@ export default function Modal({
         )}
 
         {/* Body */}
-        <div className={bodyClassName ?? "p-6 max-h-[calc(80vh-140px)] overflow-y-auto"}>
+        <div
+          className={
+            bodyClassName ??
+            "p-4 max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain sm:p-6"
+          }
+        >
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-black/5 dark:border-white/5">
+          <div className="flex flex-wrap items-center justify-end gap-3 border-t border-black/5 p-4 dark:border-white/5 sm:p-6">
             {footer}
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    portalRoot
   );
 }
 
@@ -252,10 +271,22 @@ export function ConfirmModal({
       size="sm"
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={loading}>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="min-w-0 flex-1 sm:min-w-24 sm:flex-none"
+            onClick={onClose}
+            disabled={loading}
+          >
             {resolvedCancelText}
           </Button>
-          <Button variant={variant} onClick={onConfirm} loading={loading}>
+          <Button
+            variant={variant}
+            size="lg"
+            className="min-w-0 flex-1 sm:min-w-24 sm:flex-none"
+            onClick={onConfirm}
+            loading={loading}
+          >
             {resolvedConfirmText}
           </Button>
         </>

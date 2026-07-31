@@ -6,7 +6,7 @@ type GotoDashboardRouteOptions = {
 };
 
 const DEFAULT_TIMEOUT_MS = 300_000;
-const APP_ROUTE_PATTERN = /\/(login|dashboard)(\/[^?#]*)?([?#].*)?$/;
+const APP_ROUTE_PATTERN = /\/(login|home|dashboard)(\/[^?#]*)?([?#].*)?$/;
 const E2E_PASSWORD =
   process.env.OMNIROUTE_E2E_PASSWORD || process.env.INITIAL_PASSWORD || "omniroute-e2e-password";
 
@@ -34,10 +34,10 @@ async function loginIfNeeded(page: Page, timeoutMs: number) {
   await expect(passwordInput).toBeVisible({ timeout: timeoutMs });
   await passwordInput.fill(E2E_PASSWORD);
 
-  const submitButton = page.locator("form").getByRole("button").first();
+  const submitButton = page.locator('form button[type="submit"]').first();
   await expect(submitButton).toBeEnabled({ timeout: timeoutMs });
   await Promise.all([
-    page.waitForURL(/\/dashboard(\/.*)?$/, { timeout: timeoutMs }),
+    page.waitForURL(APP_ROUTE_PATTERN, { timeout: timeoutMs }),
     submitButton.click(),
   ]);
   await page.locator("body").waitFor({ state: "visible", timeout: timeoutMs });
@@ -45,9 +45,10 @@ async function loginIfNeeded(page: Page, timeoutMs: number) {
 
 async function getDashboardAuthState(page: Page) {
   return await page.evaluate(async () => {
-    const safeJson = async (response: Response) => {
+    const safeJson = async (response: Response): Promise<Record<string, unknown> | null> => {
       try {
-        return (await response.json()) as any;
+        const value: unknown = await response.json();
+        return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
       } catch {
         return null;
       }
@@ -123,7 +124,7 @@ export async function gotoDashboardRoute(
 
       await page.locator("body").waitFor({ state: "visible", timeout: timeoutMs });
       return;
-    } catch (error: any) {
+    } catch (error: unknown) {
       lastError = error;
       await page.waitForTimeout(1000);
     }

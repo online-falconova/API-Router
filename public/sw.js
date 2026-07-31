@@ -1,8 +1,9 @@
-const CACHE_NAME = "omniroute-pwa-v2";
+const CACHE_NAME = "omniroute-pwa-v4";
 const APP_SHELL = [
   "/",
   "/offline",
   "/manifest.webmanifest",
+  "/logo.png",
   "/icon-512.png",
   "/apple-touch-icon.png",
 ];
@@ -58,7 +59,6 @@ self.addEventListener("fetch", (event) => {
   const isExcludedPath = EXCLUDED_PATH_PREFIXES.some((prefix) =>
     requestUrl.pathname.startsWith(prefix)
   );
-  const isNextAsset = requestUrl.pathname.startsWith("/_next/");
   const destination = event.request.destination;
   const isStaticAsset = ["style", "script", "image", "font"].includes(destination);
   const isNavigateRequest = event.request.mode === "navigate";
@@ -87,36 +87,26 @@ self.addEventListener("fetch", (event) => {
         return fetch(event.request);
       }
 
-      if (isNextAsset) {
-        try {
-          const networkResponse = await fetch(event.request);
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          }
-          return networkResponse;
-        } catch {
-          return (await caches.match(event.request)) || Response.error();
+      // Network-first keeps mutable public assets (especially brand images)
+      // current after a deployment while retaining an offline fallback.
+      try {
+        const networkResponse = await fetch(event.request);
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
         }
+        return networkResponse;
+      } catch {
+        return (await caches.match(event.request)) || Response.error();
       }
-
-      const cachedResponse = await caches.match(event.request);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      const networkResponse = await fetch(event.request);
-      if (networkResponse && networkResponse.status === 200) {
-        const responseClone = networkResponse.clone();
-        void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-      }
-      return networkResponse;
     })()
   );
 });
 
 async function navigationFallback(request) {
-  return (await caches.match(request)) || (await caches.match("/")) || (await caches.match("/offline"));
+  return (
+    (await caches.match(request)) || (await caches.match("/")) || (await caches.match("/offline"))
+  );
 }
 
 // ── Push Notifications ───────────────────────────────────────────────────────

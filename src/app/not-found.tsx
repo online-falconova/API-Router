@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text-main text-center"
+      className="flex min-h-dvh flex-col items-center justify-center p-4 bg-bg text-text-main text-center sm:p-6"
       role="main"
       aria-labelledby="not-found-title"
     >

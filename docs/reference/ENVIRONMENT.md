@@ -1030,6 +1030,16 @@ CLI_COMPAT_ALL=1
 
 Limits and safety knobs applied when the Skills framework (`src/lib/skills/`) executes user-defined automations in a sandboxed environment.
 
+### Catalog source
+
+| Variable                               | Default                              | Source File                                | Description                                                                           |
+| -------------------------------------- | ------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `OMNIROUTE_SKILLS_CATALOG_REPO`       | `diegosouzapw/awesome-omni-skills` | `src/lib/skills/apiRouterCatalog.ts` | GitHub repository in `owner/repo` form that supplies the installable skills catalog. |
+| `OMNIROUTE_SKILLS_CATALOG_REF`        | `v0.12.9`                            | `src/lib/skills/apiRouterCatalog.ts` | Pinned catalog tag, branch, or commit SHA; values containing `/` are rejected.       |
+| `OMNIROUTE_SKILLS_CATALOG_INDEX_PATH` | `skills_index.json`                  | `src/lib/skills/apiRouterCatalog.ts` | Relative path to the catalog index within the configured repository.                 |
+
+### Sandbox execution
+
 | Variable                          | Default                                       | Source File                  | Description                                                                                                        |
 | --------------------------------- | --------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `SKILLS_SANDBOX_TIMEOUT_MS`       | `10000` (10 s)                                | `src/lib/skills/builtins.ts` | Per-execution wall-clock timeout for sandboxed skill code. Hard cap; anything longer is killed.                    |

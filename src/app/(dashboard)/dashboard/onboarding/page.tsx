@@ -215,14 +215,14 @@ export default function OnboardingWizard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="animate-pulse text-text-muted">{tc("loading")}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-dvh flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Progress Indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -279,7 +279,7 @@ export default function OnboardingWizard() {
             {currentStep.id === "welcome" && (
               <div className="text-center space-y-4">
                 <p className="text-text-muted">{t("welcomeDesc")}</p>
-                <div className="mt-6 grid grid-cols-3 gap-3 items-stretch">
+                <div className="mt-6 grid grid-cols-1 gap-3 items-stretch sm:grid-cols-3">
                   {[
                     { icon: "swap_horiz", label: t("multiProvider") },
                     { icon: "monitoring", label: t("usageTracking") },
@@ -357,7 +357,7 @@ export default function OnboardingWizard() {
             {currentStep.id === "provider" && (
               <div className="space-y-4">
                 <p className="text-sm text-text-muted text-center">{t("providerDesc")}</p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {COMMON_PROVIDERS.map((p) => (
                     <button
                       key={p.id}

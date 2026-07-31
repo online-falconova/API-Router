@@ -16,7 +16,7 @@ import Link from "next/link";
 export default function ForbiddenPage() {
   const t = useTranslations("auth");
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-[var(--bg-primary,#0a0a0f)] text-[var(--text-primary,#e0e0e0)] text-center">
+    <div className="flex min-h-dvh flex-col items-center justify-center p-4 bg-[var(--bg-primary,#0a0a0f)] text-[var(--text-primary,#e0e0e0)] text-center sm:p-6">
       <div
         className="text-[96px] font-extrabold leading-none mb-2"
         style={{

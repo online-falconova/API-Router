@@ -490,7 +490,7 @@ export default function ProviderDetailPageClient() {
         />
       )}
       {!isUpstreamProxyProvider && !isFreeNoAuth && (
-        <Card>
+        <Card className="p-3 sm:p-4 lg:p-6">
           <ProviderAccountRoutingCard
             providerKey={providerId}
             connectionCount={connections.length}

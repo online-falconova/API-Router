@@ -21,7 +21,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     // consistent with the content. User-facing locale is handled by the normal
     // layout (<html lang={locale}> in src/app/layout.tsx).
     <html lang="en">
-      <body className="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text-main font-[system-ui,-apple-system,sans-serif] text-center m-0">
+      <body className="flex min-h-dvh flex-col items-center justify-center p-4 bg-bg text-text-main font-[system-ui,-apple-system,sans-serif] text-center m-0 sm:p-6">
         <main role="alert" aria-live="assertive" className="flex flex-col items-center">
           <div className="text-[64px] mb-4" aria-hidden="true">
             ⚠️

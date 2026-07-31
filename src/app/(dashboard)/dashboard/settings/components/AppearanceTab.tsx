@@ -14,6 +14,7 @@ import {
 } from "@/shared/constants/comboConfigMode";
 import { PIN_PROVIDER_QUOTA_TO_HOME_KEY } from "@/shared/constants/homeWidgets";
 import AccountEmailVisibilitySetting from "./AccountEmailVisibilitySetting";
+import LanguageSelector from "@/shared/components/LanguageSelector";
 
 export default function AppearanceTab() {
   const { theme, setTheme, isDark } = useTheme();
@@ -184,6 +185,18 @@ export default function AppearanceTab() {
                 <span>{themeOptionLabels[option] || option}</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">{getSettingsLabel("language", "Language")}</p>
+              <p className="text-sm text-text-muted">
+                {getSettingsLabel("languageDesc", "Choose the display language for the dashboard.")}
+              </p>
+            </div>
+            <LanguageSelector />
           </div>
         </div>
 

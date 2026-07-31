@@ -20,7 +20,7 @@ export default function MitmProxyMovedPage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-8">
+    <div className="flex min-h-dvh items-center justify-center bg-background p-4 sm:p-8">
       <div className="rounded-xl border border-amber-500/40 bg-amber-900/20 p-8 text-center max-w-md w-full space-y-4">
         <div className="flex items-center justify-center gap-2">
           <span className="material-symbols-outlined text-amber-400 text-[28px]">info</span>

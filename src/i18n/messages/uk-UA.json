@@ -932,7 +932,14 @@
     "batchDetailCancelConfirm": "Cancel this batch? In-progress requests will stop.",
     "batchActionCancelError": "Failed to cancel batch. Try again.",
     "batchActionRetryError": "Failed to retry failed requests. Try again.",
-    "batchConceptRetentionNote": "Results and error files are retained for 30 days (Anthropic: 29 days)"
+    "batchConceptRetentionNote": "Results and error files are retained for 30 days (Anthropic: 29 days)",
+    "somethingWentWrong": "Something went wrong",
+    "permissionDenied": "Permission denied",
+    "offlineTitle": "You're offline",
+    "offlineDescription": "Check your connection — we'll reconnect automatically.",
+    "slowNetworkTitle": "Slow connection",
+    "slowNetworkDescription": "Some things may take longer to load.",
+    "backOnline": "Back online"
   },
   "disabled": "Вимкнено",
   "featureFlagOmnirouteEmergencyFallbackDescription": "Перенаправляти запити з вичерпаним бюджетом на резервного безкоштовного провайдера/модель.",

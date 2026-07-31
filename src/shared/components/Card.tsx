@@ -47,8 +47,8 @@ export default function Card({
       {...props}
     >
       {(title || action) && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex min-w-0 items-center gap-3">
             {icon && (
               <div className="p-2 rounded-lg bg-bg text-text-muted">
                 <span className="material-symbols-outlined text-[20px]">{icon}</span>
