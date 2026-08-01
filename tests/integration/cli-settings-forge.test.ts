@@ -19,9 +19,7 @@ const core = await import("../../src/lib/db/core.ts");
 const localDb = await import("../../src/lib/localDb.ts");
 
 // Import route handlers
-const { GET, POST, DELETE } = await import(
-  "../../src/app/api/cli-tools/forge-settings/route.ts"
-);
+const { GET, POST, DELETE } = await import("../../src/app/api/cli-tools/forge-settings/route.ts");
 
 async function resetStorage() {
   delete process.env.INITIAL_PASSWORD;
@@ -91,7 +89,12 @@ test("forge-settings POST: 400 when model is missing", async () => {
 test("forge-settings POST: writes config.toml with valid body", async () => {
   const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "forge-home-"));
   const origHome = process.env.HOME;
+  const origConfigHome = process.env.CLI_CONFIG_HOME;
   process.env.HOME = tmpHome;
+  // On Windows os.homedir() ignores $HOME (uses %USERPROFILE%); CLI_CONFIG_HOME
+  // is the supported override so the route writes into the test tmp dir on every
+  // platform instead of the developer's real profile.
+  process.env.CLI_CONFIG_HOME = tmpHome;
 
   try {
     const res = await POST(
@@ -107,10 +110,7 @@ test("forge-settings POST: writes config.toml with valid body", async () => {
     );
 
     // 200 = success; 403 = write guard active (test env); 500 = backup dir issue
-    assert.ok(
-      [200, 403, 500].includes(res.status),
-      `Unexpected status ${res.status}`
-    );
+    assert.ok([200, 403, 500].includes(res.status), `Unexpected status ${res.status}`);
 
     if (res.status === 200) {
       const body = await res.json();
@@ -119,13 +119,18 @@ test("forge-settings POST: writes config.toml with valid body", async () => {
       const configPath = path.join(tmpHome, ".forge", "config.toml");
       if (fs.existsSync(configPath)) {
         const content = fs.readFileSync(configPath, "utf-8");
-        assert.ok(content.includes("managed by OmniRoute"), "Config should have OmniRoute marker");
+        assert.ok(
+          content.includes("managed by API Router"),
+          "Config should have API Router marker"
+        );
         assert.ok(content.includes("http://localhost:20128"), "Config should contain base URL");
         assert.ok(content.includes("[openai]"), "Config should have [openai] section");
       }
     }
   } finally {
     process.env.HOME = origHome;
+    if (origConfigHome === undefined) delete process.env.CLI_CONFIG_HOME;
+    else process.env.CLI_CONFIG_HOME = origConfigHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   }
 });
@@ -143,16 +148,13 @@ test("forge-settings DELETE: removes config file when it exists", async () => {
     fs.mkdirSync(forgeDir, { recursive: true });
     fs.writeFileSync(
       path.join(forgeDir, "config.toml"),
-      "# managed by OmniRoute (plan 14)\n[openai]\nbase_url = \"http://localhost:20128\"\n"
+      '# managed by API Router (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
     );
 
     const res = await DELETE(
       new Request("http://localhost/api/cli-tools/forge-settings", { method: "DELETE" })
     );
-    assert.ok(
-      [200, 403, 500].includes(res.status),
-      `Expected 200/403/500, got ${res.status}`
-    );
+    assert.ok([200, 403, 500].includes(res.status), `Expected 200/403/500, got ${res.status}`);
 
     if (res.status === 200) {
       const body = await res.json();
