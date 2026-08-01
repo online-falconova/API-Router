@@ -254,3 +254,7 @@ tests/homolog/.auth/
 tests/homolog/ui/.auth/
 homolog-report/
 docker-compose.yml.bak
+
+# Local-only editor auto-start task (starts dev server + browser on folder open).
+# Kept out of the shared repo so it doesn't force auto-execution on collaborators.
+/.vscode/tasks.json
