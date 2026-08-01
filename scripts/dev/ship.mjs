@@ -15,7 +15,7 @@
  *
  * Usage:
  *   npm run ship -- "commit message"
- *   npm run ship -- "commit message" --remote falconova   (default: falconova)
+ *   npm run ship -- "commit message" --remote falconova   (default: upstream = online-falconova)
  *   npm run ship -- "commit message" --no-push            (commit only)
  *   SHIP_SKIP_TESTS is implied — full test suites run in CI, not per commit.
  */
@@ -23,7 +23,7 @@ import { execSync, spawnSync } from "node:child_process";
 import process from "node:process";
 
 const rawArgs = process.argv.slice(2);
-let remote = "falconova";
+let remote = "upstream";
 let doPush = true;
 const msgParts = [];
 for (let i = 0; i < rawArgs.length; i++) {
