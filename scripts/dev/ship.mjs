@@ -15,7 +15,7 @@
  *
  * Usage:
  *   npm run ship -- "commit message"
- *   npm run ship -- "commit message" --remote falconova   (default: upstream = online-falconova)
+ *   npm run ship -- "commit message" --remote <name>      (default: upstream = online-falconova)
  *   npm run ship -- "commit message" --no-push            (commit only)
  *   SHIP_SKIP_TESTS is implied — full test suites run in CI, not per commit.
  */
