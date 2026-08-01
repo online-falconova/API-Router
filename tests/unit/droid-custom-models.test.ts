@@ -12,17 +12,16 @@ test("normalizeDroidModelList accepts legacy single `model` string", () => {
 });
 
 test("normalizeDroidModelList accepts `models` array (upstream #618)", () => {
-  assert.deepEqual(
-    normalizeDroidModelList({ models: ["openai/gpt-5", "anthropic/claude-4"] }),
-    ["openai/gpt-5", "anthropic/claude-4"]
-  );
+  assert.deepEqual(normalizeDroidModelList({ models: ["openai/gpt-5", "anthropic/claude-4"] }), [
+    "openai/gpt-5",
+    "anthropic/claude-4",
+  ]);
 });
 
 test("normalizeDroidModelList prefers `models` over legacy `model`", () => {
-  assert.deepEqual(
-    normalizeDroidModelList({ model: "legacy/old", models: ["openai/gpt-5"] }),
-    ["openai/gpt-5"]
-  );
+  assert.deepEqual(normalizeDroidModelList({ model: "legacy/old", models: ["openai/gpt-5"] }), [
+    "openai/gpt-5",
+  ]);
 });
 
 test("normalizeDroidModelList trims and dedupes, drops empty/non-string", () => {
@@ -110,10 +109,10 @@ test("buildDroidCustomModels throws on empty list", () => {
   );
 });
 
-test("isOmniRouteCustomModel matches any custom:OmniRoute-<i> id (multi-model)", () => {
-  assert.equal(isOmniRouteCustomModel({ id: "custom:OmniRoute-0" }), true);
-  assert.equal(isOmniRouteCustomModel({ id: "custom:OmniRoute-1" }), true);
-  assert.equal(isOmniRouteCustomModel({ id: "custom:OmniRoute-42" }), true);
+test("isOmniRouteCustomModel matches any custom:API Router-<i> id (multi-model)", () => {
+  assert.equal(isOmniRouteCustomModel({ id: "custom:API Router-0" }), true);
+  assert.equal(isOmniRouteCustomModel({ id: "custom:API Router-1" }), true);
+  assert.equal(isOmniRouteCustomModel({ id: "custom:API Router-42" }), true);
   assert.equal(isOmniRouteCustomModel({ id: "custom:Other-0" }), false);
   assert.equal(isOmniRouteCustomModel({ id: 42 as unknown }), false);
   assert.equal(isOmniRouteCustomModel(null), false);

@@ -22,10 +22,12 @@ process.env.JWT_SECRET = "test-jwt-secret-codewhale";
 const core = await import("../../src/lib/db/core.ts");
 const localDb = await import("../../src/lib/localDb.ts");
 
-const { GET, POST, DELETE } = await import("../../src/app/api/cli-tools/codewhale-settings/route.ts");
+const { GET, POST, DELETE } =
+  await import("../../src/app/api/cli-tools/codewhale-settings/route.ts");
 
 async function resetStorage() {
   delete process.env.INITIAL_PASSWORD;
+  delete process.env.CLI_CONFIG_HOME;
   core.resetDbInstance();
   fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true });
   fs.mkdirSync(TEST_DATA_DIR, { recursive: true });
@@ -92,6 +94,11 @@ test("codewhale-settings POST: writes primary ~/.codewhale/config.toml for a fre
   const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "codewhale-home-"));
   const origHome = process.env.HOME;
   process.env.HOME = tmpHome;
+  // On Windows os.homedir() ignores $HOME (uses %USERPROFILE%), which the CLI
+  // config path resolver relies on. CLI_CONFIG_HOME is the supported override
+  // (validated to live within the real home dir) so the route writes into the
+  // test's tmp dir on every platform instead of the developer's real profile.
+  process.env.CLI_CONFIG_HOME = tmpHome;
 
   try {
     const res = await POST(
@@ -113,7 +120,7 @@ test("codewhale-settings POST: writes primary ~/.codewhale/config.toml for a fre
       const primaryPath = path.join(tmpHome, ".codewhale", "config.toml");
       assert.ok(fs.existsSync(primaryPath), "Primary ~/.codewhale/config.toml must be written");
       const content = fs.readFileSync(primaryPath, "utf-8");
-      assert.ok(content.includes("managed by OmniRoute"), "Config should have OmniRoute marker");
+      assert.ok(content.includes("managed by API Router"), "Config should have API Router marker");
       assert.ok(content.includes("http://localhost:20128"), "Config should contain base URL");
       assert.ok(content.includes("[openai]"), "Config should have [openai] section");
 
@@ -136,6 +143,7 @@ test("codewhale-settings POST: syncs an existing legacy ~/.deepseek/config.toml"
   const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "codewhale-home-legacy-"));
   const origHome = process.env.HOME;
   process.env.HOME = tmpHome;
+  process.env.CLI_CONFIG_HOME = tmpHome;
 
   try {
     // Simulate an existing DeepSeek TUI install (pre-CodeWhale upgrade).
@@ -183,20 +191,21 @@ test("codewhale-settings GET: falls back to legacy ~/.deepseek/config.toml when 
   const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "codewhale-home-getlegacy-"));
   const origHome = process.env.HOME;
   process.env.HOME = tmpHome;
+  process.env.CLI_CONFIG_HOME = tmpHome;
 
   try {
     const legacyDir = path.join(tmpHome, ".deepseek");
     fs.mkdirSync(legacyDir, { recursive: true });
     fs.writeFileSync(
       path.join(legacyDir, "config.toml"),
-      '# managed by OmniRoute (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
+      '# managed by API Router (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
     );
 
     const res = await GET(new Request("http://localhost/api/cli-tools/codewhale-settings"));
     assert.equal(res.status, 200);
     const body = await res.json();
     if (body.config) {
-      assert.ok(body.config.includes("managed by OmniRoute"));
+      assert.ok(body.config.includes("managed by API Router"));
       assert.equal(body.hasOmniRoute, true);
     }
   } finally {
@@ -211,6 +220,7 @@ test("codewhale-settings DELETE: removes primary and legacy config files", async
   const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), "codewhale-home-del-"));
   const origHome = process.env.HOME;
   process.env.HOME = tmpHome;
+  process.env.CLI_CONFIG_HOME = tmpHome;
 
   try {
     const primaryDir = path.join(tmpHome, ".codewhale");
@@ -219,11 +229,11 @@ test("codewhale-settings DELETE: removes primary and legacy config files", async
     fs.mkdirSync(legacyDir, { recursive: true });
     fs.writeFileSync(
       path.join(primaryDir, "config.toml"),
-      '# managed by OmniRoute (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
+      '# managed by API Router (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
     );
     fs.writeFileSync(
       path.join(legacyDir, "config.toml"),
-      '# managed by OmniRoute (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
+      '# managed by API Router (plan 14)\n[openai]\nbase_url = "http://localhost:20128"\n'
     );
 
     const res = await DELETE(

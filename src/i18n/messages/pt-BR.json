@@ -6027,6 +6027,8 @@
     "general": "Geral",
     "security": "Segurança",
     "appearance": "Aparência",
+    "language": "Idioma",
+    "languageDesc": "Escolha o idioma de exibição do painel.",
     "routing": "Roteamento",
     "cache": "Cache",
     "resilience": "Resiliência",

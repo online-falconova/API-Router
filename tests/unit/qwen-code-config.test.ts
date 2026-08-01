@@ -19,7 +19,7 @@ test("writes the upstream V4 bare-array modelProviders contract without a secret
     openai: [
       {
         id: "qwen/qwen3.8-max-preview",
-        name: "qwen/qwen3.8-max-preview (OmniRoute)",
+        name: "qwen/qwen3.8-max-preview (API Router)",
         envKey: "OMNIROUTE_API_KEY",
         baseUrl: "http://localhost:20128/v1",
       },
@@ -87,7 +87,7 @@ test("replaces only the managed entry and unwraps the reverted V5 provider shape
           models: [
             {
               id: "old-model",
-              name: "old-model (OmniRoute)",
+              name: "old-model (API Router)",
               envKey: "OPENAI_API_KEY",
               baseUrl: "http://old-host/v1",
             },
@@ -111,7 +111,7 @@ test("replaces only the managed entry and unwraps the reverted V5 provider shape
     },
     {
       id: "new-model",
-      name: "new-model (OmniRoute)",
+      name: "new-model (API Router)",
       envKey: "OMNIROUTE_API_KEY",
       baseUrl: "http://new-host/v1",
     },
@@ -151,7 +151,7 @@ test("migrates the removed integration's root-array shape without dropping other
     },
     {
       id: "new-model",
-      name: "new-model (OmniRoute)",
+      name: "new-model (API Router)",
       envKey: "OMNIROUTE_API_KEY",
       baseUrl: "http://new/v1",
     },

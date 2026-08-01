@@ -70,7 +70,7 @@ test("ingress rejects a repeated instance and an exhausted hop budget", () => {
     inspectPeerRequest(new Headers({ "X-OmniRoute-Peer-Trace": "edge,gateway-a" }), env),
     {
       code: "peer_loop_detected",
-      message: "OmniRoute peer routing loop detected",
+      message: "API Router peer routing loop detected",
     }
   );
   assert.deepEqual(
@@ -80,7 +80,7 @@ test("ingress rejects a repeated instance and an exhausted hop budget", () => {
     ),
     {
       code: "peer_hop_limit_exceeded",
-      message: "OmniRoute peer routing hop limit exceeded",
+      message: "API Router peer routing hop limit exceeded",
     }
   );
 });

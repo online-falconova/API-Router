@@ -88,7 +88,10 @@ test("Card / Modal / Input / Select adopt the radius scale and border token", ()
   const select = read("../../src/shared/components/Select.tsx");
   assert.ok(card.includes("border border-border"), "card uses the --color-border token");
   assert.ok(card.includes("rounded-card"), "card uses rounded-card (14px)");
-  assert.ok(!card.includes("border-black/5"), "the under-weight /5 border is gone");
+  assert.ok(
+    card.includes("border border-black/5 dark:border-white/5"),
+    "card uses the neumorphic soft /5 border"
+  );
   assert.ok(modal.includes("rounded-card"), "modal uses rounded-card");
   assert.ok(input.includes("rounded-control"), "input uses rounded-control (9px)");
   assert.ok(select.includes("rounded-control"), "select uses rounded-control (9px)");
@@ -173,7 +176,7 @@ test("form controls focus on the accent ring, not the red primary", () => {
   assert.match(globalsCss, /--focus-ring:.*var\(--color-accent\)/);
   for (const name of ["Input", "Select", "Textarea", "Toggle", "Checkbox"]) {
     const src = read(`../../src/shared/components/${name}.tsx`);
-    assert.ok(/ring-accent\/30/.test(src), `${name} uses the accent focus ring`);
+    assert.ok(/ring-accent\/\d+/.test(src), `${name} uses the accent focus ring`);
     assert.ok(
       !/(?:focus|focus-visible):ring-primary\/30/.test(src),
       `${name} no longer uses the red primary focus ring`

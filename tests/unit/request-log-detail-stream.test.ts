@@ -166,9 +166,9 @@ test("status discrepancy shows both OmniRoute and provider statuses", () => {
 
   assert.notEqual(html.indexOf("Upstream: 200"), -1, "Should display upstream/provider status");
   assert.notEqual(
-    html.indexOf("OmniRoute returned 504"),
+    html.indexOf("API Router returned 504"),
     -1,
-    "Should indicate OmniRoute returned its own status"
+    "Should indicate API Router returned its own status"
   );
 });
 

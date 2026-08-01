@@ -6027,6 +6027,8 @@
     "general": "Chung",
     "security": "Bảo mật",
     "appearance": "Giao diện",
+    "language": "Ngôn ngữ",
+    "languageDesc": "Chọn ngôn ngữ hiển thị cho bảng điều khiển.",
     "routing": "Định tuyến",
     "cache": "Cache",
     "resilience": "Khả năng phục hồi",
