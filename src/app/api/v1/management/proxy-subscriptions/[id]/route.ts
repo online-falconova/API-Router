@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { requireManagementAuth } from "@/lib/api/requireManagementAuth";
 import { createErrorResponseFromUnknown } from "@/lib/api/errorResponse";
 import {
@@ -9,6 +10,14 @@ import {
 } from "@/lib/proxySubscription";
 
 type RouteCtx = { params: Promise<{ id: string }> };
+
+// Route-level input validation (T06 gate). Mirrors the pre-existing
+// `!body || typeof body !== "object"` guard exactly, so this adds Zod
+// `.safeParse()` validation with no behavior change; the per-field `typeof`
+// checks below continue to own the partial-update normalization.
+const jsonObjectSchema = z
+  .unknown()
+  .refine((v) => v !== null && typeof v === "object", { message: "Invalid JSON body" });
 
 /**
  * GET    /api/v1/management/proxy-subscriptions/:id — fetch one subscription.
@@ -36,10 +45,11 @@ export async function PATCH(request: Request, ctx: RouteCtx) {
   try {
     const { id } = await ctx.params;
     const body = await request.json().catch(() => null);
-    if (!body || typeof body !== "object") {
+    const shape = jsonObjectSchema.safeParse(body);
+    if (!shape.success) {
       return Response.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const b = body as Record<string, unknown>;
+    const b = shape.data as Record<string, unknown>;
     const payload: Partial<ProxySubscriptionPayload> = {};
     if (typeof b.name === "string") payload.name = b.name.trim();
     if (typeof b.url === "string") payload.url = b.url.trim();

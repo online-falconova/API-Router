@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { requireManagementAuth } from "@/lib/api/requireManagementAuth";
 import { createErrorResponseFromUnknown } from "@/lib/api/errorResponse";
 import {
@@ -7,6 +8,14 @@ import {
   redactSubscriptionUrl,
   type ProxySubscriptionPayload,
 } from "@/lib/proxySubscription";
+
+// Route-level input validation (T06 gate). Mirrors the pre-existing
+// `!body || typeof body !== "object"` guard exactly (arrays — typeof "object" —
+// still pass through to parsePayload, which reports the specific field errors),
+// so this adds Zod `.safeParse()` validation with no behavior change.
+const jsonObjectSchema = z
+  .unknown()
+  .refine((v) => v !== null && typeof v === "object", { message: "Invalid JSON body" });
 
 /**
  * GET  /api/v1/management/proxy-subscriptions — list all operator subscriptions.
@@ -72,7 +81,11 @@ export async function POST(request: Request) {
   if (authError) return authError;
   try {
     const body = await request.json().catch(() => null);
-    const parsed = parsePayload(body);
+    const shape = jsonObjectSchema.safeParse(body);
+    if (!shape.success) {
+      return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const parsed = parsePayload(shape.data);
     if ("error" in parsed) {
       return Response.json({ error: parsed.error }, { status: 400 });
     }
