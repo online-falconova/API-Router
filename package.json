@@ -79,6 +79,7 @@
   "homepage": "https://falconova.com",
   "scripts": {
     "dev": "node --max-old-space-size=8192 scripts/dev/run-next.mjs dev",
+    "ship": "node scripts/dev/ship.mjs",
     "up": "concurrently -n server,browser \"npm run dev\" \"node scripts/dev/open-when-ready.mjs\"",
     "live": "npm run api",
     "api": "node scripts/dev/run-api.mjs",
