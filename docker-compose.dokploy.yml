@@ -97,6 +97,12 @@ services:
     #       OMNIROUTE_BASE_PATH: ${OMNIROUTE_BASE_PATH:-}
     #       OMNIROUTE_BUILD_MEMORY_MB: ${OMNIROUTE_BUILD_MEMORY_MB:-4096}
     image: ${API_ROUTER_IMAGE:-ghcr.io/online-falconova/api-router:latest}
+    # Force a fresh pull on every deploy. Without this, `docker compose up`
+    # reuses the VPS's locally-cached `:latest` layer and the container restarts
+    # on the OLD image — so pushes build a new GHCR image but the live site never
+    # changes. `always` makes Dokploy pull the current `:latest` digest each deploy
+    # (the tag is public on GHCR), guaranteeing the running container matches main.
+    pull_policy: always
     restart: unless-stopped
     stop_grace_period: 40s
     depends_on:
