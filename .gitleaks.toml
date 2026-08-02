@@ -86,4 +86,12 @@
     regexes = [
       '''latencyP\d{2}Ms''',
       '''interleaved-thinking-2025-05-14''',
+      # API-Router fork FPs (não são segredos). Revisar em v3.9.0:
+      #  - localStorage dismissal key for the Kimi sponsor banner
+      #    (src/app/(dashboard)/dashboard/KimiSponsorBanner.tsx).
+      #  - Adobe Firefly's PUBLIC web-UI x-api-key client identifier, documented
+      #    in a captured-request comment (open-sse/services/usage/adobeFirefly.ts);
+      #    a public client id, not a private secret.
+      '''omniroute-kimi-sponsor-banner-dismissed-v1''',
+      '''SunbreakWebUI1''',
     ]
