@@ -40,6 +40,13 @@ class MainActivity : AppCompatActivity() {
     private var backToast: Toast? = null
 
     /**
+     * The URL currently shown. Kept in sync via `doUpdateVisitedHistory`, which also
+     * fires for SPA (`pushState`) navigations, so it stays accurate on the dashboard.
+     * Used to detect the app's root screen for the double-back-to-exit behaviour.
+     */
+    private var currentUrl: String? = null
+
+    /**
      * Whether the web page's active scroll container is at its very top.
      * Reported from JS because the dashboard scrolls an inner `overflow-y:auto`
      * element (the document itself never scrolls, so [WebView.getScrollY] stays 0).
@@ -157,8 +164,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
+                super.doUpdateVisitedHistory(view, url, isReload)
+                // Fires for full loads AND SPA pushState/replaceState navigations,
+                // which is what keeps root detection correct on the dashboard.
+                currentUrl = url
+            }
+
             override fun onPageFinished(view: WebView, url: String?) {
                 pageReady = true
+                currentUrl = url
                 binding.swipeRefresh.isRefreshing = false
                 binding.progressBar.visibility = View.GONE
                 hideSplash()
@@ -248,19 +263,28 @@ class MainActivity : AppCompatActivity() {
     private fun setupBackNavigation() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // While there is web history, back navigates the page as usual.
-                if (binding.webView.canGoBack()) {
-                    binding.webView.goBack()
+                val webView = binding.webView
+                // Deeper in the site → back navigates the page, as expected.
+                //
+                // The root check matters: the dashboard is a single-page app, so every
+                // in-app navigation pushes a history entry and canGoBack() is almost
+                // always true. Relying on canGoBack() alone meant back walked the SPA
+                // history forever and the exit branch was never reached.
+                if (!isAtAppRoot() && webView.canGoBack()) {
+                    webView.goBack()
                     return
                 }
-                // No history left → a back press would close the app. Require a
-                // second press/swipe within the window to actually exit; the first
-                // one just warns. This applies to both the button and the gesture.
+
+                // On the root screen a back would leave the app: require a second back
+                // within the window. Applies to the button and the swipe gesture alike.
                 val now = System.currentTimeMillis()
-                if (now - lastBackPressTime <= BACK_EXIT_WINDOW_MS) {
+                if (now - lastBackPressTime in 0..BACK_EXIT_WINDOW_MS) {
                     backToast?.cancel()
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
+                    backToast = null
+                    // finish() is the reliable exit. The previous approach (disabling
+                    // this callback and re-dispatching) could leave back handling dead
+                    // if the activity did not actually finish.
+                    finish()
                 } else {
                     lastBackPressTime = now
                     backToast?.cancel()
@@ -274,6 +298,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    /**
+     * True when the WebView is showing one of the app's root screens, where a back
+     * press should exit rather than pop SPA history. Unknown/!app-host URLs return
+     * false so normal history navigation still applies (no behaviour regression).
+     */
+    private fun isAtAppRoot(): Boolean {
+        val url = currentUrl ?: return true // nothing loaded yet → treat as root
+        val uri = runCatching { Uri.parse(url) }.getOrNull() ?: return false
+        val host = uri.host?.lowercase() ?: return false
+        if (host != APP_HOST && !host.endsWith(".$APP_HOST")) return false
+        val path = (uri.path ?: "").trimEnd('/').lowercase()
+        // Bare origin ("" or "/") is the entry point, which redirects to the dashboard.
+        if (path.isEmpty()) return true
+        return path.substringAfterLast('/') in ROOT_SEGMENTS
     }
 
     private fun errorPageHtml(): String = """
@@ -322,9 +362,14 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.webView.onResume()
+        // Drop any stale back-press timestamp so returning to the app never exits on
+        // a single back just because a press happened before backgrounding.
+        lastBackPressTime = 0L
     }
 
     override fun onDestroy() {
+        backToast?.cancel()
+        backToast = null
         binding.webView.destroy()
         super.onDestroy()
     }
@@ -408,6 +453,16 @@ class MainActivity : AppCompatActivity() {
 
         // Window within which a second back press exits the app.
         private const val BACK_EXIT_WINDOW_MS = 2000L
+
+        /**
+         * Final path segments that identify one of the app's root screens.
+         *
+         * Matching the LAST segment (rather than the whole path) keeps this correct when
+         * the site is deployed under a base path — the web app supports
+         * NEXT_PUBLIC_OMNIROUTE_BASE_PATH, so the dashboard can live at
+         * "/<base>/dashboard" as well as "/dashboard".
+         */
+        private val ROOT_SEGMENTS = setOf("dashboard", "home", "login")
 
         /**
          * Reports to native whether the page's active scroll container sits at the top.
