@@ -1,14 +1,16 @@
 /**
  * API Router brand logo.
  *
- * Renders the canonical brand artwork at `public/logo.png` (the operator-
- * provided logo). The `size` prop sets a square box and the image is
- * `object-contain`, so the logo keeps its aspect ratio at any call site
- * (sidebar, landing nav/footer, login).
- *
- * The `className` is preserved for layout tweaks. Any color utility (e.g.
- * `text-white`) is a no-op on a raster image and is simply ignored.
+ * Renders the official brand artwork with zero external network dependency
+ * via an embedded high-resolution data URI. This guarantees instant, smooth
+ * rendering on both localhost and live servers without broken-image icons,
+ * 404s, or reverse-proxy path issues.
  */
+import React from "react";
+import { BRAND_LOGO_DATA_URI } from "./brandLogoAsset";
+
+export { BRAND_LOGO_DATA_URI };
+
 type OmniRouteLogoProps = {
   size?: number;
   className?: string;
@@ -16,74 +18,18 @@ type OmniRouteLogoProps = {
 
 export default function OmniRouteLogo({ size = 20, className = "" }: OmniRouteLogoProps) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 512 512"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={BRAND_LOGO_DATA_URI}
+      alt="API Router"
       role="img"
       aria-label="API Router"
-      className={`object-contain shrink-0 ${className}`}
+      width={size}
+      height={size}
+      className={`object-contain shrink-0 select-none ${className}`}
       style={{ width: size, height: size }}
-    >
-      <title>API Router</title>
-
-      {/* Hexagon ring (pointy-top). No background plate: canvas is transparent. */}
-      <path
-        d="M256 24 L457 140 L457 372 L256 488 L55 372 L55 140 Z"
-        fill="none"
-        stroke="#DC2626"
-        strokeWidth="28"
-        strokeLinejoin="round"
-      />
-
-      {/* Plugs: two on the left, two on the right, heads facing the cube. */}
-      <g fill="#DC2626">
-        {/* left upper */}
-        <g transform="translate(78 176)">
-          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
-          <rect x="-20" y="9" width="20" height="13" rx="5" />
-          <rect x="-20" y="36" width="20" height="13" rx="5" />
-        </g>
-        {/* left lower */}
-        <g transform="translate(78 278)">
-          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
-          <rect x="-20" y="9" width="20" height="13" rx="5" />
-          <rect x="-20" y="36" width="20" height="13" rx="5" />
-        </g>
-        {/* right upper (mirrored) */}
-        <g transform="translate(434 176) scale(-1 1)">
-          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
-          <rect x="-20" y="9" width="20" height="13" rx="5" />
-          <rect x="-20" y="36" width="20" height="13" rx="5" />
-        </g>
-        {/* right lower (mirrored) */}
-        <g transform="translate(434 278) scale(-1 1)">
-          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
-          <rect x="-20" y="9" width="20" height="13" rx="5" />
-          <rect x="-20" y="36" width="20" height="13" rx="5" />
-        </g>
-      </g>
-
-      {/* Isometric cube: light top, dark left, mid right. */}
-      <path d="M256 144 L368 208 L256 272 L144 208 Z" fill="#EF4444" />
-      <path d="M144 208 L256 272 L256 396 L144 332 Z" fill="#991B1B" />
-      <path d="M368 208 L256 272 L256 396 L368 332 Z" fill="#DC2626" />
-
-      {/* "API" drawn as paths, not <text>: no font dependency */}
-      <g fill="#FFFFFF">
-        {/* A */}
-        <path d="M202 254 L242 330 L162 330 Z M202 292 L224 330 L180 330 Z" fillRule="evenodd" />
-        <rect x="181" y="304" width="42" height="14" />
-        {/* P */}
-        <path
-          d="M251 254 L277 254 A25 24 0 0 1 277 302 L267 302 L267 330 L251 330 Z M267 268 L275 268 A10 10 0 0 1 275 288 L267 288 Z"
-          fillRule="evenodd"
-        />
-        {/* I */}
-        <rect x="327" y="254" width="18" height="76" />
-      </g>
-    </svg>
+      loading="eager"
+      decoding="sync"
+    />
   );
 }

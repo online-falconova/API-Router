@@ -3,7 +3,7 @@ import React from "react";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import OmniRouteLogo from "@/shared/components/OmniRouteLogo";
+import OmniRouteLogo, { BRAND_LOGO_DATA_URI } from "@/shared/components/OmniRouteLogo";
 
 // @ts-expect-error test environment flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -30,36 +30,40 @@ describe("OmniRouteLogo", () => {
     }
   });
 
-  it("renders a vector SVG directly without external img network dependency", () => {
+  it("renders the official brand logo with embedded data URI and zero network latency", () => {
     const container = renderLogo({ size: 40 });
-    const svg = container.querySelector("svg");
     const img = container.querySelector("img");
 
-    expect(img).toBeNull();
-    expect(svg).not.toBeNull();
-    expect(svg?.getAttribute("role")).toBe("img");
-    expect(svg?.getAttribute("aria-label")).toBe("API Router");
-    expect(svg?.getAttribute("viewBox")).toBe("0 0 512 512");
+    expect(img).not.toBeNull();
+    expect(img?.getAttribute("role")).toBe("img");
+    expect(img?.getAttribute("alt")).toBe("API Router");
+    expect(img?.getAttribute("aria-label")).toBe("API Router");
+    expect(img?.getAttribute("src")).toBe(BRAND_LOGO_DATA_URI);
+    expect(img?.getAttribute("src")).toMatch(/^data:image\/png;base64,/);
   });
 
-  it("applies the requested size and className", () => {
+  it("applies the requested size, attributes, and className", () => {
     const container = renderLogo({ size: 48, className: "test-logo-class" });
-    const svg = container.querySelector("svg");
+    const img = container.querySelector("img");
 
-    expect(svg?.getAttribute("width")).toBe("48");
-    expect(svg?.getAttribute("height")).toBe("48");
-    expect(svg?.getAttribute("class")).toContain("test-logo-class");
-    expect(svg?.getAttribute("class")).toContain("shrink-0");
+    expect(img?.getAttribute("width")).toBe("48");
+    expect(img?.getAttribute("height")).toBe("48");
+    expect(img?.getAttribute("class")).toContain("test-logo-class");
+    expect(img?.getAttribute("class")).toContain("shrink-0");
+    expect(img?.getAttribute("class")).toContain("object-contain");
+    expect(img?.getAttribute("loading")).toBe("eager");
+    expect(img?.getAttribute("decoding")).toBe("sync");
+    expect(img?.style.width).toBe("48px");
+    expect(img?.style.height).toBe("48px");
   });
 
-  it("includes all canonical brand artwork paths and groups", () => {
-    const container = renderLogo({ size: 40 });
-    const paths = container.querySelectorAll("path");
-    const rects = container.querySelectorAll("rect");
+  it("embeds a valid high-resolution PNG asset", () => {
+    expect(BRAND_LOGO_DATA_URI).toBeDefined();
+    expect(BRAND_LOGO_DATA_URI.startsWith("data:image/png;base64,")).toBe(true);
 
-    // Hexagon ring + 4 plug heads + 3 cube faces + 2 API letter paths = at least 10 paths
-    expect(paths.length).toBeGreaterThanOrEqual(10);
-    // Plug pins + letter bars = at least 10 rects
-    expect(rects.length).toBeGreaterThanOrEqual(10);
+    // PNG base64 payload starts with iVBORw0KGgo (standard PNG magic bytes)
+    const base64Part = BRAND_LOGO_DATA_URI.replace("data:image/png;base64,", "");
+    expect(base64Part.startsWith("iVBORw0KGgo")).toBe(true);
+    expect(base64Part.length).toBeGreaterThan(1000);
   });
 });
