@@ -13,6 +13,7 @@ import {
   toggleExpandedSection,
 } from "@/shared/utils/sidebarExpansionState";
 import { APP_CONFIG } from "@/shared/constants/appConfig";
+import { withBasePath } from "@/shared/utils/basePath";
 import OmniRouteLogo from "./OmniRouteLogo";
 import Button from "./Button";
 import Input from "./Input";
@@ -104,6 +105,7 @@ export default function Sidebar({
   const [sidebarItemOrder, setSidebarItemOrder] = useState<SidebarItemOrder>({});
   const [customAppName, setCustomAppName] = useState<string | null>(null);
   const [customLogo, setCustomLogo] = useState<string | null>(null);
+  const [customLogoFailed, setCustomLogoFailed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<SidebarSectionId>>(
     new Set([DEFAULT_EXPANDED])
   );
@@ -148,6 +150,7 @@ export default function Sidebar({
       );
       setCustomAppName(data?.instanceName || null);
       setCustomLogo(data?.customLogoBase64 || data?.customLogoUrl || null);
+      setCustomLogoFailed(false);
     };
 
     fetch("/api/settings")
@@ -189,8 +192,10 @@ export default function Sidebar({
       if ("instanceName" in detail) setCustomAppName((detail.instanceName as string) || null);
       if ("customLogoBase64" in detail) {
         setCustomLogo((detail.customLogoBase64 as string) || null);
+        setCustomLogoFailed(false);
       } else if ("customLogoUrl" in detail) {
         setCustomLogo((detail.customLogoUrl as string) || null);
+        setCustomLogoFailed(false);
       }
     };
 
@@ -503,14 +508,15 @@ export default function Sidebar({
             className={cn("flex items-center", collapsed ? "justify-center" : "gap-2.5")}
           >
             <div className="flex items-center justify-center size-10 shrink-0">
-              {customLogo ? (
+              {customLogo && !customLogoFailed ? (
                 <Image
-                  src={customLogo}
+                  src={withBasePath(customLogo)}
                   alt={customAppName || APP_CONFIG.name}
                   width={40}
                   height={40}
                   unoptimized
                   className="size-10 object-contain"
+                  onError={() => setCustomLogoFailed(true)}
                 />
               ) : (
                 <OmniRouteLogo size={40} />

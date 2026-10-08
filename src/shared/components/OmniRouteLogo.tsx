@@ -16,14 +16,74 @@ type OmniRouteLogoProps = {
 
 export default function OmniRouteLogo({ size = 20, className = "" }: OmniRouteLogoProps) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/logo.png"
+    <svg
       width={size}
       height={size}
-      alt="API Router"
-      className={`object-contain ${className}`}
+      viewBox="0 0 512 512"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="API Router"
+      className={`object-contain shrink-0 ${className}`}
       style={{ width: size, height: size }}
-    />
+    >
+      <title>API Router</title>
+
+      {/* Hexagon ring (pointy-top). No background plate: canvas is transparent. */}
+      <path
+        d="M256 24 L457 140 L457 372 L256 488 L55 372 L55 140 Z"
+        fill="none"
+        stroke="#DC2626"
+        strokeWidth="28"
+        strokeLinejoin="round"
+      />
+
+      {/* Plugs: two on the left, two on the right, heads facing the cube. */}
+      <g fill="#DC2626">
+        {/* left upper */}
+        <g transform="translate(78 176)">
+          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
+          <rect x="-20" y="9" width="20" height="13" rx="5" />
+          <rect x="-20" y="36" width="20" height="13" rx="5" />
+        </g>
+        {/* left lower */}
+        <g transform="translate(78 278)">
+          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
+          <rect x="-20" y="9" width="20" height="13" rx="5" />
+          <rect x="-20" y="36" width="20" height="13" rx="5" />
+        </g>
+        {/* right upper (mirrored) */}
+        <g transform="translate(434 176) scale(-1 1)">
+          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
+          <rect x="-20" y="9" width="20" height="13" rx="5" />
+          <rect x="-20" y="36" width="20" height="13" rx="5" />
+        </g>
+        {/* right lower (mirrored) */}
+        <g transform="translate(434 278) scale(-1 1)">
+          <path d="M0 0 H34 A29 29 0 0 1 34 58 H0 Z" />
+          <rect x="-20" y="9" width="20" height="13" rx="5" />
+          <rect x="-20" y="36" width="20" height="13" rx="5" />
+        </g>
+      </g>
+
+      {/* Isometric cube: light top, dark left, mid right. */}
+      <path d="M256 144 L368 208 L256 272 L144 208 Z" fill="#EF4444" />
+      <path d="M144 208 L256 272 L256 396 L144 332 Z" fill="#991B1B" />
+      <path d="M368 208 L256 272 L256 396 L368 332 Z" fill="#DC2626" />
+
+      {/* "API" drawn as paths, not <text>: no font dependency */}
+      <g fill="#FFFFFF">
+        {/* A */}
+        <path d="M202 254 L242 330 L162 330 Z M202 292 L224 330 L180 330 Z" fillRule="evenodd" />
+        <rect x="181" y="304" width="42" height="14" />
+        {/* P */}
+        <path
+          d="M251 254 L277 254 A25 24 0 0 1 277 302 L267 302 L267 330 L251 330 Z M267 268 L275 268 A10 10 0 0 1 275 288 L267 288 Z"
+          fillRule="evenodd"
+        />
+        {/* I */}
+        <rect x="327" y="254" width="18" height="76" />
+      </g>
+    </svg>
   );
 }
