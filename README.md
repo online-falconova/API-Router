@@ -1330,7 +1330,7 @@ diegosouzapw. The MIT licence requires the upstream copyright notice to be retai
 
 **[⬆ Back to top](#-api-router--the-free-ai-gateway)** · Built with ❤️ for the open-source AI community.
 
-<sub>API Router v3.8.50 · Node ≥22.22.2 · MIT License © <a href="https://falconova.com">Falconova.com</a></sub>
+<sub>API Router v3.8.51 · Node ≥22.22.2 · MIT License © <a href="https://falconova.com">Falconova.com</a></sub>
 
 </div>
 <!-- GitHub Discussions enabled for community Q&A -->
