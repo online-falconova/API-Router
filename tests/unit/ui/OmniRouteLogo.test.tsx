@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import OmniRouteLogo from "@/shared/components/OmniRouteLogo";
+import { isValidCustomLogo } from "@/shared/utils/customLogo";
 
 // @ts-expect-error test environment flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -61,5 +62,38 @@ describe("OmniRouteLogo", () => {
     expect(paths.length).toBeGreaterThanOrEqual(10);
     // Plug pins + letter bars = at least 10 rects
     expect(rects.length).toBeGreaterThanOrEqual(10);
+  });
+});
+
+describe("isValidCustomLogo", () => {
+  it("rejects empty, null, undefined, or string literal null values", () => {
+    expect(isValidCustomLogo(null)).toBe(false);
+    expect(isValidCustomLogo(undefined)).toBe(false);
+    expect(isValidCustomLogo("")).toBe(false);
+    expect(isValidCustomLogo("   ")).toBe(false);
+    expect(isValidCustomLogo("null")).toBe(false);
+    expect(isValidCustomLogo("undefined")).toBe(false);
+  });
+
+  it("rejects references to the built-in default logo assets", () => {
+    expect(isValidCustomLogo("/logo.png")).toBe(false);
+    expect(isValidCustomLogo("logo.png")).toBe(false);
+    expect(isValidCustomLogo("/logo.svg")).toBe(false);
+    expect(isValidCustomLogo("logo.svg")).toBe(false);
+    expect(isValidCustomLogo("/brand-logo.png")).toBe(false);
+    expect(isValidCustomLogo("brand-logo.png")).toBe(false);
+    expect(isValidCustomLogo("/logo.ico")).toBe(false);
+    expect(isValidCustomLogo("/logo.webp")).toBe(false);
+  });
+
+  it("rejects UI placeholder URLs", () => {
+    expect(isValidCustomLogo("https://example.com/logo.png")).toBe(false);
+    expect(isValidCustomLogo("http://example.com/logo.png")).toBe(false);
+  });
+
+  it("accepts valid custom uploaded base64 data URIs and custom URLs", () => {
+    expect(isValidCustomLogo("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...")).toBe(true);
+    expect(isValidCustomLogo("https://mycompany.com/assets/custom-logo.png")).toBe(true);
+    expect(isValidCustomLogo("/uploads/tenants/custom-logo.png")).toBe(true);
   });
 });

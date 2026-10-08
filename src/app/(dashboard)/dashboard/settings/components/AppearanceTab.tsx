@@ -656,6 +656,9 @@ export default function AppearanceTab() {
                     src={settings.customLogoBase64 || settings.customLogoUrl}
                     alt={t("appearanceLogoPreviewAlt")}
                     className="h-12 w-auto max-w-full rounded"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
                   />
                 </div>
               )}
