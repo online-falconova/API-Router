@@ -12,8 +12,6 @@ import {
   toggleExpandedSection,
 } from "@/shared/utils/sidebarExpansionState";
 import { APP_CONFIG } from "@/shared/constants/appConfig";
-import { withBasePath } from "@/shared/utils/basePath";
-import { isValidCustomLogo } from "@/shared/utils/customLogo";
 import OmniRouteLogo from "./OmniRouteLogo";
 import Button from "./Button";
 import Input from "./Input";
@@ -104,8 +102,6 @@ export default function Sidebar({
   const [sidebarSectionOrder, setSidebarSectionOrder] = useState<SidebarSectionId[]>([]);
   const [sidebarItemOrder, setSidebarItemOrder] = useState<SidebarItemOrder>({});
   const [customAppName, setCustomAppName] = useState<string | null>(null);
-  const [customLogo, setCustomLogo] = useState<string | null>(null);
-  const [loadedCustomLogo, setLoadedCustomLogo] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<SidebarSectionId>>(
     new Set([DEFAULT_EXPANDED])
   );
@@ -141,35 +137,6 @@ export default function Sidebar({
     setSidebarExpansionLoaded(true);
   }, []);
 
-  // Pre-validate network-based custom logos before display to prevent broken-image glitches.
-  useEffect(() => {
-    if (!customLogo) {
-      setLoadedCustomLogo(null);
-      return;
-    }
-
-    if (customLogo.startsWith("data:image/")) {
-      setLoadedCustomLogo(customLogo);
-      return;
-    }
-
-    if (typeof window === "undefined") return;
-
-    let active = true;
-    const img = new window.Image();
-    img.src = withBasePath(customLogo);
-    img.onload = () => {
-      if (active) setLoadedCustomLogo(customLogo);
-    };
-    img.onerror = () => {
-      if (active) setLoadedCustomLogo(null);
-    };
-
-    return () => {
-      active = false;
-    };
-  }, [customLogo]);
-
   useEffect(() => {
     const applySettings = (data) => {
       setShowDebug(data?.debugMode === true);
@@ -178,8 +145,6 @@ export default function Sidebar({
         normalizeHiddenSidebarGroupLabels(data?.[HIDDEN_SIDEBAR_GROUP_LABELS_SETTING_KEY])
       );
       setCustomAppName(data?.instanceName || null);
-      const rawLogo = data?.customLogoBase64 || data?.customLogoUrl || null;
-      setCustomLogo(isValidCustomLogo(rawLogo) ? (rawLogo as string).trim() : null);
     };
 
     fetch("/api/settings")
@@ -219,11 +184,6 @@ export default function Sidebar({
         setSidebarItemOrder(detail[SIDEBAR_ITEM_ORDER_KEY] as SidebarItemOrder);
       }
       if ("instanceName" in detail) setCustomAppName((detail.instanceName as string) || null);
-      if ("customLogoBase64" in detail || "customLogoUrl" in detail) {
-        const rawLogo =
-          (detail.customLogoBase64 as string) || (detail.customLogoUrl as string) || null;
-        setCustomLogo(isValidCustomLogo(rawLogo) ? rawLogo.trim() : null);
-      }
     };
 
     window.addEventListener(SIDEBAR_SETTINGS_UPDATED_EVENT, handleSettingsUpdated as EventListener);
@@ -535,17 +495,7 @@ export default function Sidebar({
             className={cn("flex items-center", collapsed ? "justify-center" : "gap-2.5")}
           >
             <div className="flex items-center justify-center size-10 shrink-0">
-              {loadedCustomLogo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={withBasePath(loadedCustomLogo)}
-                  alt={customAppName || APP_CONFIG.name}
-                  className="size-10 object-contain"
-                  onError={() => setLoadedCustomLogo(null)}
-                />
-              ) : (
-                <OmniRouteLogo size={40} />
-              )}
+              <OmniRouteLogo size={40} />
             </div>
             {!collapsed && (
               <div className="flex flex-col min-w-0">
