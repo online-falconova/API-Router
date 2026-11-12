@@ -8,6 +8,7 @@ import {
   GITHUB_COPILOT_EDITOR_VERSION,
   GITHUB_COPILOT_REFRESH_PLUGIN_VERSION,
   GITHUB_COPILOT_REFRESH_USER_AGENT,
+  KIRO_IDE_VERSION,
   KIRO_AMZ_USER_AGENT,
   KIRO_SDK_USER_AGENT,
   QWEN_CLI_VERSION,
@@ -75,4 +76,12 @@ test("provider header profiles tolerate browser-like process shims", async () =>
     Object.defineProperty(process, "arch", { value: originalArch, configurable: true });
     Object.defineProperty(process, "version", { value: originalVersion, configurable: true });
   }
+});
+
+test("Kiro generation uses the current shared IDE identity", () => {
+  assert.equal(KIRO_IDE_VERSION, "1.4.154");
+  const headers = getKiroServiceHeaders();
+  assert.match(headers["User-Agent"], /KiroIDE-1\.4\.154/);
+  assert.match(headers["X-Amz-User-Agent"], /KiroIDE-1\.4\.154/);
+  assert.doesNotMatch(headers["User-Agent"], /kiro-ide\/1\.0\.0/);
 });
